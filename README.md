@@ -180,7 +180,7 @@ class Demo extends StatelessWidget {
 
 This package is in a very early stages of development and quite experimental.
 
-[PRs]([https://github.com/vipul1298/xy_table](https://github.com/GeekyAnts/flutter_multi_scroll_table/pulls) and [bug reports](https://github.com/GeekyAnts/flutter_multi_scroll_table/issues) are welcome!
+
 
 <!-- TODO: Tell users more about the package: where to find more information, how to
 contribute to the package, how to file issues, what response they can expect
