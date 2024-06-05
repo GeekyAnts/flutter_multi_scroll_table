@@ -7,19 +7,19 @@ import 'component/scrollable_column.dart';
 class FlutterMultiScrollTable extends StatefulWidget {
   final List<Widget> columns;
   final List<Widget> scrollableColumnChildren;
-  final List<Widget> fixedColumnChildren;
-  final double fixedColumnWidth;
+  final List<List<Widget>> fixedColumnChildren;
+  final List<double> fixedColumnWidths;
+  final List<String>? fixedColumnTitles;
   final double totalWidth;
   final double? height;
-  final String? fixedColumnName;
 
   const FlutterMultiScrollTable({
     super.key,
     required this.columns,
-    this.fixedColumnName,
+    this.fixedColumnTitles,
     required this.totalWidth,
     this.height = 500,
-    required this.fixedColumnWidth,
+    required this.fixedColumnWidths,
     required this.scrollableColumnChildren,
     required this.fixedColumnChildren,
   });
@@ -33,51 +33,50 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   late ScrollController _horizontalScrollController;
   late ScrollController _headerScrollController;
   late ScrollController _verticalScrollController;
-  bool _isScrolling = false;
+  bool _isHorizontalScrolling = false;
+  bool _isHeaderScrolling = false;
+
   @override
   void initState() {
     _horizontalScrollController = ScrollController();
     _headerScrollController = ScrollController();
     _verticalScrollController = ScrollController();
 
-    _horizontalScrollController.addListener(_syncScroll);
-    _headerScrollController.addListener(_syncScroll);
+    _horizontalScrollController.addListener(_syncHorizontalScroll);
+    _headerScrollController.addListener(_syncHeaderScroll);
     super.initState();
   }
 
-  void _syncScroll() {
-    if (_isScrolling) return;
+  void _syncHorizontalScroll() {
+    if (_isHeaderScrolling) return;
 
-    _isScrolling = true;
+    _isHorizontalScrolling = true;
 
     if (_horizontalScrollController.hasClients &&
         _headerScrollController.hasClients) {
-      if (_horizontalScrollController.position.isScrollingNotifier.value) {
-        _headerScrollController
-            .animateTo(
-              _horizontalScrollController.offset,
-              duration: const Duration(milliseconds: 100),
-              curve: Curves.easeInOut,
-            )
-            .whenComplete(() => _isScrolling = false);
-      } else if (_headerScrollController.position.isScrollingNotifier.value) {
-        _horizontalScrollController
-            .animateTo(
-              _headerScrollController.offset,
-              duration: const Duration(milliseconds: 100),
-              curve: Curves.easeInOut,
-            )
-            .whenComplete(() => _isScrolling = false);
-      } else {
-        _isScrolling = false;
-      }
+      _headerScrollController.jumpTo(_horizontalScrollController.offset);
     }
+
+    _isHorizontalScrolling = false;
+  }
+
+  void _syncHeaderScroll() {
+    if (_isHorizontalScrolling) return;
+
+    _isHeaderScrolling = true;
+
+    if (_headerScrollController.hasClients &&
+        _horizontalScrollController.hasClients) {
+      _horizontalScrollController.jumpTo(_headerScrollController.offset);
+    }
+
+    _isHeaderScrolling = false;
   }
 
   @override
   void dispose() {
-    _horizontalScrollController.removeListener(_syncScroll);
-    _headerScrollController.removeListener(_syncScroll);
+    _horizontalScrollController.removeListener(_syncHorizontalScroll);
+    _headerScrollController.removeListener(_syncHeaderScroll);
 
     _horizontalScrollController.dispose();
     _headerScrollController.dispose();
@@ -88,38 +87,55 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   @override
   Widget build(BuildContext context) {
+    double totalFixedWidth = widget.fixedColumnWidths.reduce((a, b) => a + b);
+
+    List<Widget> fixedColumns = [];
+    List<Widget> scrollableColumns = [];
+    for (int i = 0; i < widget.columns.length; i++) {
+      if (i < widget.fixedColumnWidths.length) {
+        fixedColumns.add(SizedBox(
+          width: widget.fixedColumnWidths[i],
+          child: widget.columns[i],
+        ));
+      } else {
+        scrollableColumns.add(widget.columns[i]);
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            SizedBox(
-              width: widget.fixedColumnWidth,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EachCell(
-                    text: widget.fixedColumnName ?? "",
-                    height: 45,
-                    isHeader: true,
-                    width: widget.fixedColumnWidth,
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    width: widget.fixedColumnWidth,
-                    child: const Divider(
-                      height: 1,
+            Row(
+              children: List.generate(widget.fixedColumnWidths.length, (index) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EachCell(
+                      text: widget.fixedColumnTitles?[index] ?? "",
+                      height: 45,
+                      isHeader: true,
+                      width: widget.fixedColumnWidths[index],
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 5),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      width: widget.fixedColumnWidths[index],
+                      child: const Divider(
+                        height: 1,
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     key: const Key("header"),
                     scrollDirection: Axis.horizontal,
                     controller: _headerScrollController,
@@ -130,9 +146,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                   const SizedBox(height: 5),
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 2),
-                    width: widget.columns.length * 60,
+                    width: (widget.columns.length -
+                            widget.fixedColumnWidths.length) *
+                        60,
                     child: const Divider(
-                      color: Colors.grey,
                       height: 1,
                     ),
                   ),
@@ -144,24 +161,30 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         SizedBox(
           height: widget.height,
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             key: const Key("data"),
             scrollDirection: Axis.vertical,
             controller: _verticalScrollController,
             child: Row(
               children: [
-                FixedColumn(
-                  width: widget.fixedColumnWidth,
-                  fixedColumnName: widget.fixedColumnName,
-                  rows: widget.fixedColumnChildren,
+                Row(
+                  children:
+                      List.generate(widget.fixedColumnWidths.length, (index) {
+                    return FixedColumn(
+                      width: widget.fixedColumnWidths[index],
+                      fixedColumnName: widget.fixedColumnTitles?[index],
+                      rows: widget.fixedColumnChildren[index],
+                    );
+                  }),
                 ),
                 const SizedBox(
                   width: 0,
                 ),
                 ScrollableColumn(
-                  width: widget.totalWidth - widget.fixedColumnWidth,
+                  width: widget.totalWidth - totalFixedWidth,
                   rows: widget.scrollableColumnChildren,
                   scrollController: _horizontalScrollController,
-                  columns: widget.columns,
+                  columns: scrollableColumns,
                 )
               ],
             ),

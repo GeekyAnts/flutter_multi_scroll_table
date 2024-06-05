@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/flutter_multi_scroll_table.dart';
 import 'package:flutter_multi_scroll_table/src/component/each_cell.dart';
 
-class Demo extends StatelessWidget {
+import 'utils/utils.dart';
+
+class Demo extends StatefulWidget {
   const Demo({super.key});
 
+  @override
+  State<Demo> createState() => _DemoState();
+}
+
+class _DemoState extends State<Demo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,84 +19,122 @@ class Demo extends StatelessWidget {
       backgroundColor: Colors.white,
       body: FlutterMultiScrollTable(
         totalWidth: 700,
-        fixedColumnWidth: 80,
         height: 500,
         scrollableColumnChildren: List.generate(
+          20,
+          (index) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  EachCell(
+                    text: Utils.names[index],
+                    width: 120,
+                    // height: 60,
+                  ),
+                  const EachCell(
+                    text: "B",
+                    width: 50,
+                  ),
+                  const EachCell(
+                    text: "C",
+                    width: 50,
+                  ),
+                  const EachCell(
+                    text: "D",
+                    width: 50,
+                  ),
+                  const EachCell(
+                    text: "E",
+                    width: 50,
+                  ),
+                  const EachCell(
+                    text: "F",
+                    width: 50,
+                  ),
+                  const EachCell(
+                    text: "G",
+                    width: 50,
+                  ),
+                  const EachCell(
+                    text: "H",
+                    width: 50,
+                  )
+                ],
+              ),
+              const SizedBox(height: 5),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                width: 600 - 60,
+                child: const Divider(
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+        fixedColumnChildren: [
+          Utils.srNumbers.map((number) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: number.toString(),
+                  width: 80,
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+          List.generate(
             20,
             (index) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        EachCell(
-                          text: "Vipul Chaurasia",
-                          width: 105,
-                          // height: 60,
-                        ),
-                        EachCell(
-                          text: "B",
-                          width: 50,
-                        ),
-                        EachCell(
-                          text: "C",
-                          width: 50,
-                        ),
-                        EachCell(
-                          text: "D",
-                          width: 50,
-                        ),
-                        EachCell(
-                          text: "E",
-                          width: 50,
-                        ),
-                        EachCell(
-                          text: "F",
-                          width: 50,
-                        ),
-                        EachCell(
-                          text: "G",
-                          width: 50,
-                        ),
-                        EachCell(
-                          text: "H",
-                          width: 50,
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      width: 600 - 60,
-                      child: const Divider(
-                        color: Colors.grey,
-                        height: 1,
-                      ),
-                    ),
-                  ],
-                )),
-        fixedColumnChildren: List.generate(
-            20,
-            (index) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const EachCell(
-                      text: "C",
-                      width: 80,
-                    ),
-                    const SizedBox(height: 5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: const Divider(
-                        height: 1,
-                      ),
-                    ),
-                  ],
-                )),
-        fixedColumnName: "S.no",
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const EachCell(
+                  text: "Y",
+                  width: 80,
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Utils.numbers.map((number) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: number.toString(),
+                  width: 80,
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ],
+        fixedColumnTitles: const ["S.no", 'A', 'B'],
         columns: const [
           EachCell(
-            text: "Member",
-            width: 105,
+            text: "Members",
+            width: 120,
             isHeader: true,
           ),
           EachCell(
@@ -128,6 +173,7 @@ class Demo extends StatelessWidget {
             isHeader: true,
           ),
         ],
+        fixedColumnWidths: const [40, 40, 40],
       ),
     );
   }
