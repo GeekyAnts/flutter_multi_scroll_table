@@ -27,21 +27,21 @@ TODO: List what your package can do. Maybe include images, gifs, or videos. -->
 ## Usage
 
 ```dart
-import 'package:flutter_multi_scroll_table/ flutter_multi_scroll_table.dart';
+import 'package:flutter_multi_scroll_table/flutter_multi_scroll_table.dart';
 
 ```
 
 Easy to use , just call the widget name
 
 ```dart
-class Demo extends StatefulWidget {
-  const Demo({super.key});
+class DemoScreen extends StatefulWidget {
+  const DemoScreen({super.key});
 
   @override
-  State<Demo> createState() => _DemoState();
+  State<DemoScreen> createState() => _DemoScreenState();
 }
 
-class _DemoState extends State<Demo> {
+class _DemoScreenState extends State<DemoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -217,7 +217,7 @@ class _DemoState extends State<Demo> {
 | totalWidth               | Required parameter for giving the width to the list view.                                                                       |
 | fixedColumnWidths        | Required parameter for the fixed columns which are scrollable only in vertical direction.                                       |
 | height                   | Optional parameter that denotes the total height of the list view.                                                              |
-| fixedColumnNames         | Optional parameter that denotes the fixed columns name.                                                                         |
+| fixedColumnTitles        | Optional parameter that denotes the fixed columns titles.                                                                       |
 | scrollableColumnChildren | Required parameter used to show list items which is scrollable in both vertical and horizontal direction.                       |
 | fixedColumnChildren      | Required parameter used to show list items which is scrollable only in vertical direction.                                      |
 | columns                  | Required parameter used to give the column names for list items which is scrollable in both vertical and horizontal directions. |
