@@ -4,14 +4,14 @@ import 'package:flutter_multi_scroll_table/src/component/each_cell.dart';
 
 import 'utils/utils.dart';
 
-class Demo extends StatefulWidget {
-  const Demo({super.key});
+class DemoScreen extends StatefulWidget {
+  const DemoScreen({super.key});
 
   @override
-  State<Demo> createState() => _DemoState();
+  State<DemoScreen> createState() => _DemoScreenState();
 }
 
-class _DemoState extends State<Demo> {
+class _DemoScreenState extends State<DemoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

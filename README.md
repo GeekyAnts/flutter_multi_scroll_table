@@ -26,6 +26,11 @@ TODO: List what your package can do. Maybe include images, gifs, or videos. -->
 
 ## Usage
 
+```dart
+import 'package:flutter_multi_scroll_table/ flutter_multi_scroll_table.dart';
+
+```
+
 Easy to use , just call the widget name
 
 ```dart
