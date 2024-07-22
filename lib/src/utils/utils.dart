@@ -48,6 +48,10 @@ class Utils {
         return (widget.children.first as EachCell).text;
       }
     }
+    if (widget is EachCell) {
+      return widget.text;
+    }
+
     return '';
   }
 
