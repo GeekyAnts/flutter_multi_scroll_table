@@ -1,7 +1,6 @@
 import 'package:example/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/flutter_multi_scroll_table.dart';
-import 'package:flutter_multi_scroll_table/src/component/each_cell.dart';
 
 class DemoScreen extends StatefulWidget {
   const DemoScreen({super.key});
