@@ -156,6 +156,7 @@ class _DemoScreenState extends State<DemoScreen> {
               children: [
                 EachCell(
                   text: CommonUtils.countries[index],
+                  backgroundColor: Colors.yellow,
                   width: 100,
                   height: 45,
                 ),

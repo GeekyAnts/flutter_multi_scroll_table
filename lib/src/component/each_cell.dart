@@ -56,31 +56,63 @@ class EachCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double containerWidth = width ?? 50;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return Container(
+          height: height ?? 40,
+          alignment: isHeader ? Alignment.bottomCenter : Alignment.center,
+          padding: padding,
+          margin: margin,
+          decoration: BoxDecoration(
+            border: border,
+            color: backgroundColor,
+            borderRadius: borderRadius,
+          ),
+          width: constraints.maxWidth,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: constraints.maxWidth,
+            ),
+            child: Text(
+              text,
+              style:
+                  textStyle ?? const TextStyle(height: 1, color: Colors.black),
+              textAlign: isLeftAlign ? TextAlign.left : TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
-    return Container(
-      height: height ?? 40,
-      alignment: isHeader ? Alignment.bottomCenter : Alignment.center,
-      padding: padding,
-      margin: margin,
-      decoration: BoxDecoration(
-        border: border,
-        color: backgroundColor,
-        borderRadius: borderRadius,
-      ),
-      key: UniqueKey(),
-      width: containerWidth,
-      child: Center(
-        child: Text(
-          text,
-          style: textStyle ??
-              const TextStyle(
-                height: 1,
-                color: Colors.black,
-              ),
-          textAlign: isLeftAlign ? TextAlign.left : TextAlign.center,
-        ),
-      ),
+extension EachCellCopyWith on EachCell {
+  EachCell copyWith({
+    String? text,
+    bool? isHeader,
+    bool? isLeftAlign,
+    double? width,
+    double? height,
+    TextStyle? textStyle,
+    Color? backgroundColor,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxBorder? border,
+    BorderRadiusGeometry? borderRadius,
+  }) {
+    return EachCell(
+      text: text ?? this.text,
+      isHeader: isHeader ?? this.isHeader,
+      isLeftAlign: isLeftAlign ?? this.isLeftAlign,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      textStyle: textStyle ?? this.textStyle,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
     );
   }
 }
