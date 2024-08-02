@@ -15,11 +15,6 @@ and the Flutter guide for
 
 A Flutter package used to show list scrollable in both vertical and horizontal direction.
 
-## Installation
-
-First, add `flutter_multi_scroll_table` as a
-[dependency in your pubspec.yaml file](https://flutter.dev/docs/development/platform-integration/platform-channels).
-
 ## Features
 
 - **Sort by Column:** You can now sort the columns of the table by clicking on the header. This feature allows you to organize your data in ascending or descending order.
@@ -29,6 +24,11 @@ First, add `flutter_multi_scroll_table` as a
 - **Adjustable Columns:** The columns of the table are now dynamically adjustable. You can resize the width of each column by dragging, providing a more tailored view of your data.
 
 - **Rotation Feature:** The table now supports viewing in both portrait and landscape modes. The layout adjusts automatically to fit the orientation, ensuring an optimal viewing experience on all devices.
+
+## Installation
+
+First, add `flutter_multi_scroll_table` as a
+[dependency in your pubspec.yaml file](https://flutter.dev/docs/development/platform-integration/platform-channels).
 
 ## Usage
 
