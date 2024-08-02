@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_multi_scroll_table/src/component/each_cell.dart';
-import 'package:flutter_multi_scroll_table/src/utils/utils.dart';
+
+import '../flutter_multi_scroll_table.dart';
 
 /// A widget that displays a multi-scrollable table with fixed and scrollable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
@@ -28,6 +28,10 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// The border for the table.
   final BoxBorder? tableBorder;
 
+  /// [draggableIcon] is the icon displayed for dragging the column width.
+
+  final Widget? draggableIcon;
+
   /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
@@ -39,6 +43,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.isAscending = true,
     required this.fixedColumnHeader,
     this.tableBorder,
+    this.draggableIcon,
   });
 
   @override
@@ -131,19 +136,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate totalFixedWidth from fixedColumnHeader
-    // double totalFixedWidth = 0;
-    // for (var cell in widget.fixedColumnHeader) {
-    //   if (cell is EachCell) {
-    //     totalFixedWidth += cell.width ?? 0.0;
-    //   }
-    // }
-
-    // Adjust height based on orientation
     double adjustedHeight =
         MediaQuery.of(context).orientation == Orientation.landscape
             ? MediaQuery.of(context).size.height *
-                0.7 // Adjust this value as needed
+                0.8 // Adjust this value as needed
             : widget.height ?? 500;
 
     return SingleChildScrollView(
@@ -156,66 +152,6 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Row(
-              //   children: [
-              //     GestureDetector(
-              //       onTap: _sortColumn,
-              //       child: Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: widget.fixedColumnHeader.map((header) {
-              //           final eachCell = header as EachCell;
-              //           return ResizableColumn(
-              //             initialWidth: eachCell.width ?? 100,
-              //             header: header,
-              //             children: widget.fixedColumnChildren[
-              //                 widget.fixedColumnHeader.indexOf(header)],
-              //           );
-              //         }).toList(),
-              //       ),
-              //     ),
-              //     Flexible(
-              //       fit: FlexFit.loose,
-              //       child: GestureDetector(
-              //         onTap: _sortColumn,
-              //         child: Column(
-              //           mainAxisSize: MainAxisSize.min,
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             SingleChildScrollView(
-              //               physics: const BouncingScrollPhysics(),
-              //               key: const Key("header"),
-              //               scrollDirection: Axis.horizontal,
-              //               controller: _headerScrollController,
-              //               child: Row(
-              //                 children:
-              //                     widget.scrollableColumnHeader.map((header) {
-              //                   final eachCell = header as EachCell;
-              //                   return ResizableColumn(
-              //                     initialWidth: eachCell.width ?? 100,
-              //                     header: header,
-              //                     children: widget.scrollableColumnChildren[
-              //                         widget.scrollableColumnHeader
-              //                             .indexOf(header)],
-              //                   );
-              //                 }).toList(),
-              //               ),
-              //             ),
-              //             const SizedBox(height: 5),
-              //             Container(
-              //               padding: const EdgeInsets.symmetric(vertical: 2),
-              //               width: double.infinity,
-              //               child: const Divider(
-              //                 height: 1,
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-
-              // NEw
               SizedBox(
                 height: adjustedHeight,
                 child: SingleChildScrollView(
@@ -230,9 +166,13 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                         child: Row(
                           children: widget.fixedColumnHeader.map((header) {
                             final eachCell = header as EachCell;
+
                             return ResizableColumn(
                               initialWidth: eachCell.width ?? 100,
                               header: header,
+                              isExpandable: eachCell.isExpandable,
+                              isFixed: true,
+                              draggableIcon: widget.draggableIcon,
                               children: widget.fixedColumnChildren[
                                   widget.fixedColumnHeader.indexOf(header)],
                             );
@@ -254,10 +194,11 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                       .map((header) {
                                     final eachCell = header as EachCell;
 
-                                    print(eachCell.width);
                                     return ResizableColumn(
                                       initialWidth: eachCell.width ?? 100,
                                       header: header,
+                                      isExpandable: eachCell.isExpandable,
+                                      draggableIcon: widget.draggableIcon,
                                       children: widget.scrollableColumnChildren[
                                           widget.scrollableColumnHeader
                                               .indexOf(header)],
@@ -277,76 +218,6 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class ResizableColumn extends StatefulWidget {
-  final double initialWidth;
-  final Widget header;
-  final List<Widget> children;
-
-  const ResizableColumn({
-    Key? key,
-    required this.initialWidth,
-    required this.header,
-    required this.children,
-  }) : super(key: key);
-
-  @override
-  _ResizableColumnState createState() => _ResizableColumnState();
-}
-
-class _ResizableColumnState extends State<ResizableColumn> {
-  late double _width;
-
-  @override
-  void initState() {
-    super.initState();
-    _width = widget.initialWidth;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: _width,
-          child: widget.header is EachCell
-              ? (widget.header as EachCell).copyWith(width: _width)
-              : widget.header,
-        ),
-        MouseRegion(
-          cursor: SystemMouseCursors.resizeLeftRight,
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onHorizontalDragUpdate: (details) {
-              setState(() {
-                final newWidth = _width + details.delta.dx;
-                if (newWidth >= widget.initialWidth) {
-                  _width = newWidth;
-                }
-              });
-            },
-            child: const Icon(
-              Icons.chevron_right,
-              size: 12,
-              color: Colors.red,
-            ),
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: widget.children.map((child) {
-            return SizedBox(
-              width: _width,
-              child:
-                  child is EachCell ? (child).copyWith(width: _width) : child,
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 }

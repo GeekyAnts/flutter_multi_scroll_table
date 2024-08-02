@@ -105,7 +105,7 @@ class CommonUtils {
     "Mexico",
     "Brazil",
     "Argentina",
-    "United Kingdommmmmm",
+    "United Kingdom",
     "France",
     "Germany",
     "Italy",

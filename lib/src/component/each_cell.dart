@@ -19,6 +19,7 @@ class EachCell extends StatelessWidget {
     this.border,
     this.borderRadius,
     this.margin,
+    this.isExpandable = false,
   }) : super(key: key);
 
   /// The text content of the cell.
@@ -53,6 +54,9 @@ class EachCell extends StatelessWidget {
 
   /// The border radius of the cell.
   final BorderRadiusGeometry? borderRadius;
+
+  /// Whether the cell is expandable. Default is false.
+  final bool isExpandable;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +104,7 @@ extension EachCellCopyWith on EachCell {
     EdgeInsetsGeometry? margin,
     BoxBorder? border,
     BorderRadiusGeometry? borderRadius,
+    bool? isExpandable,
   }) {
     return EachCell(
       text: text ?? this.text,
@@ -113,6 +118,7 @@ extension EachCellCopyWith on EachCell {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
+      isExpandable: isExpandable ?? this.isExpandable,
     );
   }
 }
