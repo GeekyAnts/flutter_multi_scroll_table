@@ -25,6 +25,10 @@ A Flutter package used to show list scrollable in both vertical and horizontal d
 
 - **Rotation Feature:** The table now supports viewing in both portrait and landscape modes. The layout adjusts automatically to fit the orientation, ensuring an optimal viewing experience on all devices.
 
+
+https://github.com/user-attachments/assets/d6580a5f-1b32-49a8-92cd-d252d5a53cab
+
+
 ## Installation
 
 First, add `flutter_multi_scroll_table` as a
