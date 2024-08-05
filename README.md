@@ -15,14 +15,28 @@ and the Flutter guide for
 
 A Flutter package used to show list scrollable in both vertical and horizontal direction.
 
+## Features
+
+- **Sort by Column:** You can now sort the columns of the table by clicking on the header. This feature allows you to organize your data in ascending or descending order.
+
+- **More Options for EachCell:** EachCell widget now supports additional customization options, including background color and other styling properties. This enables more flexible and visually appealing table designs.
+
+- **Adjustable Columns:** The columns of the table are now dynamically adjustable. You can resize the width of each column by dragging, providing a more tailored view of your data.
+
+- **Rotation Feature:** The table now supports viewing in both portrait and landscape modes. The layout adjusts automatically to fit the orientation, ensuring an optimal viewing experience on all devices.
+
+
+https://github.com/user-attachments/assets/2ab33486-2b41-45f0-bcd3-52dcbc13dbfb
+
+
+
+https://github.com/user-attachments/assets/d6580a5f-1b32-49a8-92cd-d252d5a53cab
+
+
 ## Installation
 
 First, add `flutter_multi_scroll_table` as a
 [dependency in your pubspec.yaml file](https://flutter.dev/docs/development/platform-integration/platform-channels).
-
-<!-- ## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos. -->
 
 ## Usage
 
@@ -42,77 +56,48 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
+  final List<int> _numbers = List.generate(20, (index) => index + 1)..shuffle();
+
+  final List<String> _randomAlphabets =
+      List.generate(20, (_) => CommonUtils.generateRandomAlphabet());
+
+  final TextStyle? headerTextStyle =
+      const TextStyle(fontWeight: FontWeight.bold);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       backgroundColor: Colors.white,
       body: FlutterMultiScrollTable(
-        totalWidth: 700,
+        totalWidth: 900,
         height: 500,
-        scrollableColumnChildren: List.generate(
-          20,
-          (index) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  EachCell(
-                    text: Utils.names[index],
-                    width: 120,
-                    // height: 60,
-                  ),
-                  const EachCell(
-                    text: "B",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "C",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "D",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "E",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "F",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "G",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "H",
-                    width: 50,
-                  )
-                ],
-              ),
-              const SizedBox(height: 5),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                width: 600 - 60,
-                child: const Divider(
-                  height: 1,
-                ),
-              ),
-            ],
+        tableBorder: Border(),
+        fixedColumnHeader: [
+          EachCell(
+            text: "Sr. No",
+            width: 60,
+            textStyle: headerTextStyle,
+            isHeader: true,
           ),
-        ),
+          EachCell(
+            text: "Random",
+            width: 90,
+            textStyle: headerTextStyle,
+            isHeader: true,
+            isExpandable: true,
+          ),
+        ],
         fixedColumnChildren: [
-          Utils.srNumbers.map((number) {
+          _numbers.map((number) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 EachCell(
                   text: number.toString(),
                   width: 80,
+                  height: 45,
                 ),
-                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: const Divider(
@@ -122,16 +107,36 @@ class _DemoScreenState extends State<DemoScreen> {
               ],
             );
           }).toList(),
+          _randomAlphabets.map((number) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: number.toString(),
+                  width: 90,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ],
+        scrollableColumnChildren: [
           List.generate(
             20,
             (index) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const EachCell(
-                  text: "Y",
-                  width: 80,
+                EachCell(
+                  text: CommonUtils.names[index],
+                  width: 100,
+                  height: 45,
                 ),
-                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: const Divider(
@@ -141,15 +146,15 @@ class _DemoScreenState extends State<DemoScreen> {
               ],
             ),
           ),
-          Utils.numbers.map((number) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          List.generate(
+            20,
+            (index) => Column(
               children: [
                 EachCell(
-                  text: number.toString(),
-                  width: 80,
+                  text: CommonUtils.cities[index],
+                  width: 100,
+                  height: 45,
                 ),
-                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: const Divider(
@@ -157,70 +162,244 @@ class _DemoScreenState extends State<DemoScreen> {
                   ),
                 ),
               ],
-            );
-          }).toList(),
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.fruits[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.carBrands[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countries[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
-        fixedColumnTitles: const ["S.no", 'A', 'B'],
-        columns: const [
+        scrollableColumnHeader: [
           EachCell(
             text: "Members",
-            width: 120,
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "A",
-            width: 50,
+            text: "Cities",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "B",
-            width: 50,
+            text: "Fruits",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "C",
-            width: 50,
+            text: "Cars",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "D",
-            width: 50,
+            text: "Countries",
+            width: 100,
+            textStyle: headerTextStyle,
+            isHeader: true,
+            isExpandable: true,
+          ),
+          EachCell(
+            text: "Codes",
+            textStyle: headerTextStyle,
+            width: 100,
             isHeader: true,
           ),
           EachCell(
-            text: "E",
-            width: 50,
+            text: "Random 1",
+            textStyle: headerTextStyle,
+            width: 100,
             isHeader: true,
           ),
           EachCell(
-            text: "F",
-            width: 50,
+            text: "Random 2",
+            textStyle: headerTextStyle,
+            width: 100,
             isHeader: true,
           ),
           EachCell(
-            text: "G",
-            width: 50,
+            text: "Random 3",
+            width: 100,
+            textStyle: headerTextStyle,
+            isHeader: true,
+          ),
+          EachCell(
+            text: "Random 4",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
         ],
-        fixedColumnWidths: const [40, 40, 40],
       ),
     );
   }
 }
+
 ```
 
 ## Parameters
 
-| Parameters               | Description                                                                                                                     |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| totalWidth               | Required parameter for giving the width to the list view.                                                                       |
-| fixedColumnWidths        | Required parameter for the fixed columns which are scrollable only in vertical direction.                                       |
-| height                   | Optional parameter that denotes the total height of the list view.                                                              |
-| fixedColumnTitles        | Optional parameter that denotes the fixed columns titles.                                                                       |
-| scrollableColumnChildren | Required parameter used to show list items which is scrollable in both vertical and horizontal direction.                       |
-| fixedColumnChildren      | Required parameter used to show list items which is scrollable only in vertical direction.                                      |
-| columns                  | Required parameter used to give the column names for list items which is scrollable in both vertical and horizontal directions. |
+| Parameters                 | Description                                                                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `totalWidth`               | **Required**. The total width of the table.                                                                                    |
+| `fixedColumnHeader`        | **Required**. The header widgets for the fixed columns which are scrollable only in vertical direction.                        |
+| `height`                   | Optional. The total height of the list view. Default is 500.                                                                   |
+| `scrollableColumnHeader`   | **Required**. The header widgets for the scrollable columns which are scrollable in both vertical and horizontal directions.   |
+| `scrollableColumnChildren` | **Required**. The children widgets for the scrollable columns which are scrollable in both vertical and horizontal directions. |
+| `fixedColumnChildren`      | **Required**. The children widgets for the fixed columns which are scrollable only in vertical direction.                      |
+| `isAscending`              | Optional. Whether the sorting is in ascending order. Default is true.                                                          |
+| `tableBorder`              | Optional. The border for the table.                                                                                            |
+| `draggableIcon`            | Optional. The icon displayed for dragging the column width.                                                                    |
 
 ## Additional information
 

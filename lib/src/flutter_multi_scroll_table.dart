@@ -1,27 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_multi_scroll_table/src/component/each_cell.dart';
 
-import 'component/fixed_column.dart';
-import 'component/scrollable_column.dart';
+import '../flutter_multi_scroll_table.dart';
 
+/// A widget that displays a multi-scrollable table with fixed and scrollable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
-  final List<Widget> columns;
-  final List<Widget> scrollableColumnChildren;
+  /// The header widgets for the scrollable columns.
+  final List<Widget> scrollableColumnHeader;
+
+  /// The children widgets for the scrollable columns.
+  final List<List<Widget>> scrollableColumnChildren;
+
+  /// The header widgets for the fixed columns.
+  final List<Widget> fixedColumnHeader;
+
+  /// The children widgets for the fixed columns.
   final List<List<Widget>> fixedColumnChildren;
-  final List<double> fixedColumnWidths;
-  final List<String>? fixedColumnTitles;
+
+  /// The total width of the table.
   final double totalWidth;
+
+  /// The height of the table. Default is 500.
   final double? height;
 
+  /// Whether the sorting is in ascending order. Default is true.
+  final bool isAscending;
+
+  /// The border for the table.
+  final BoxBorder? tableBorder;
+
+  /// [draggableIcon] is the icon displayed for dragging the column width.
+
+  final Widget? draggableIcon;
+
+  /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
-    required this.columns,
-    this.fixedColumnTitles,
+    required this.scrollableColumnHeader,
     required this.totalWidth,
     this.height = 500,
-    required this.fixedColumnWidths,
     required this.scrollableColumnChildren,
     required this.fixedColumnChildren,
+    this.isAscending = true,
+    required this.fixedColumnHeader,
+    this.tableBorder,
+    this.draggableIcon,
   });
 
   @override
@@ -47,6 +69,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     super.initState();
   }
 
+  /// Synchronizes the horizontal scroll position between the table body and the header.
   void _syncHorizontalScroll() {
     if (_isHeaderScrolling) return;
 
@@ -60,6 +83,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     _isHorizontalScrolling = false;
   }
 
+  /// Synchronizes the header scroll position with the horizontal scroll position of the table body.
   void _syncHeaderScroll() {
     if (_isHorizontalScrolling) return;
 
@@ -71,6 +95,31 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     }
 
     _isHeaderScrolling = false;
+  }
+
+  /// Sorts the columns based on the text content.
+  void _sortColumn() {
+    setState(() {
+      // Sort all fixed columns
+      for (int i = 0; i < widget.fixedColumnChildren.length; i++) {
+        widget.fixedColumnChildren[i].sort((a, b) {
+          final textA = Utils.getTextFromWidget(a);
+          final textB = Utils.getTextFromWidget(b);
+          final comparisonResult = Utils.compareTexts(textA, textB);
+          return widget.isAscending ? comparisonResult : -comparisonResult;
+        });
+      }
+
+      // Sort all scrollable columns
+      for (int i = 0; i < widget.scrollableColumnChildren.length; i++) {
+        widget.scrollableColumnChildren[i].sort((a, b) {
+          final textA = Utils.getTextFromWidget(a);
+          final textB = Utils.getTextFromWidget(b);
+          final comparisonResult = Utils.compareTexts(textA, textB);
+          return widget.isAscending ? comparisonResult : -comparisonResult;
+        });
+      }
+    });
   }
 
   @override
@@ -87,110 +136,88 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   @override
   Widget build(BuildContext context) {
-    double totalFixedWidth = widget.fixedColumnWidths.reduce((a, b) => a + b);
+    double adjustedHeight =
+        MediaQuery.of(context).orientation == Orientation.landscape
+            ? MediaQuery.of(context).size.height *
+                0.8 // Adjust this value as needed
+            : widget.height ?? 500;
 
-    List<Widget> fixedColumns = [];
-    List<Widget> scrollableColumns = [];
-    for (int i = 0; i < widget.columns.length; i++) {
-      if (i < widget.fixedColumnWidths.length) {
-        fixedColumns.add(SizedBox(
-          width: widget.fixedColumnWidths[i],
-          child: widget.columns[i],
-        ));
-      } else {
-        scrollableColumns.add(widget.columns[i]);
-      }
-    }
+    return SingleChildScrollView(
+      child: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            border: widget.tableBorder ??
+                Border.all(width: 0.6, color: Colors.grey),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: adjustedHeight,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  key: const Key("data"),
+                  scrollDirection: Axis.vertical,
+                  controller: _verticalScrollController,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: _sortColumn,
+                        child: Row(
+                          children: widget.fixedColumnHeader.map((header) {
+                            final eachCell = header as EachCell;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Row(
-              children: List.generate(widget.fixedColumnWidths.length, (index) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EachCell(
-                      text: widget.fixedColumnTitles?[index] ?? "",
-                      height: 45,
-                      isHeader: true,
-                      width: widget.fixedColumnWidths[index],
-                    ),
-                    const SizedBox(height: 5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      width: widget.fixedColumnWidths[index],
-                      child: const Divider(
-                        height: 1,
+                            return ResizableColumn(
+                              initialWidth: eachCell.width ?? 100,
+                              header: header,
+                              isExpandable: eachCell.isExpandable,
+                              isFixed: true,
+                              draggableIcon: widget.draggableIcon,
+                              children: widget.fixedColumnChildren[
+                                  widget.fixedColumnHeader.indexOf(header)],
+                            );
+                          }).toList(),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    key: const Key("header"),
-                    scrollDirection: Axis.horizontal,
-                    controller: _headerScrollController,
-                    child: Row(
-                      children: [...widget.columns],
-                    ),
+                      Flexible(
+                        child: GestureDetector(
+                          onTap: _sortColumn,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                controller: _horizontalScrollController,
+                                child: Row(
+                                  children: widget.scrollableColumnHeader
+                                      .map((header) {
+                                    final eachCell = header as EachCell;
+
+                                    return ResizableColumn(
+                                      initialWidth: eachCell.width ?? 100,
+                                      header: header,
+                                      isExpandable: eachCell.isExpandable,
+                                      draggableIcon: widget.draggableIcon,
+                                      children: widget.scrollableColumnChildren[
+                                          widget.scrollableColumnHeader
+                                              .indexOf(header)],
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 5),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    width: (widget.columns.length -
-                            widget.fixedColumnWidths.length) *
-                        60,
-                    child: const Divider(
-                      height: 1,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            )
-          ],
-        ),
-        SizedBox(
-          height: widget.height,
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            key: const Key("data"),
-            scrollDirection: Axis.vertical,
-            controller: _verticalScrollController,
-            child: Row(
-              children: [
-                Row(
-                  children:
-                      List.generate(widget.fixedColumnWidths.length, (index) {
-                    return FixedColumn(
-                      width: widget.fixedColumnWidths[index],
-                      fixedColumnName: widget.fixedColumnTitles?[index],
-                      rows: widget.fixedColumnChildren[index],
-                    );
-                  }),
-                ),
-                const SizedBox(
-                  width: 0,
-                ),
-                ScrollableColumn(
-                  width: widget.totalWidth - totalFixedWidth,
-                  rows: widget.scrollableColumnChildren,
-                  scrollController: _horizontalScrollController,
-                  columns: scrollableColumns,
-                )
-              ],
-            ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

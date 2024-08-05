@@ -1,8 +1,6 @@
+import 'package:example/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/flutter_multi_scroll_table.dart';
-import 'package:flutter_multi_scroll_table/src/component/each_cell.dart';
-
-import 'utils/utils.dart';
 
 class DemoScreen extends StatefulWidget {
   const DemoScreen({super.key});
@@ -12,77 +10,47 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
+  final List<int> _numbers = List.generate(20, (index) => index + 1)..shuffle();
+
+  final List<String> _randomAlphabets =
+      List.generate(20, (_) => CommonUtils.generateRandomAlphabet());
+
+  final TextStyle? headerTextStyle =
+      const TextStyle(fontWeight: FontWeight.bold);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       backgroundColor: Colors.white,
       body: FlutterMultiScrollTable(
-        totalWidth: 700,
+        totalWidth: 900,
         height: 500,
-        scrollableColumnChildren: List.generate(
-          20,
-          (index) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  EachCell(
-                    text: Utils.names[index],
-                    width: 120,
-                    // height: 60,
-                  ),
-                  const EachCell(
-                    text: "B",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "C",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "D",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "E",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "F",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "G",
-                    width: 50,
-                  ),
-                  const EachCell(
-                    text: "H",
-                    width: 50,
-                  )
-                ],
-              ),
-              const SizedBox(height: 5),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                width: 600 - 60,
-                child: const Divider(
-                  height: 1,
-                ),
-              ),
-            ],
+        fixedColumnHeader: [
+          EachCell(
+            text: "Sr. No",
+            width: 60,
+            textStyle: headerTextStyle,
+            isHeader: true,
           ),
-        ),
+          EachCell(
+            text: "Random",
+            width: 90,
+            textStyle: headerTextStyle,
+            isHeader: true,
+            isExpandable: true,
+          ),
+        ],
         fixedColumnChildren: [
-          Utils.srNumbers.map((number) {
+          _numbers.map((number) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 EachCell(
                   text: number.toString(),
                   width: 80,
+                  height: 45,
                 ),
-                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: const Divider(
@@ -92,16 +60,36 @@ class _DemoScreenState extends State<DemoScreen> {
               ],
             );
           }).toList(),
+          _randomAlphabets.map((number) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: number.toString(),
+                  width: 90,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ],
+        scrollableColumnChildren: [
           List.generate(
             20,
             (index) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const EachCell(
-                  text: "Y",
-                  width: 80,
+                EachCell(
+                  text: CommonUtils.names[index],
+                  width: 100,
+                  height: 45,
                 ),
-                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: const Divider(
@@ -111,15 +99,15 @@ class _DemoScreenState extends State<DemoScreen> {
               ],
             ),
           ),
-          Utils.numbers.map((number) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          List.generate(
+            20,
+            (index) => Column(
               children: [
                 EachCell(
-                  text: number.toString(),
-                  width: 80,
+                  text: CommonUtils.cities[index],
+                  width: 100,
+                  height: 45,
                 ),
-                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: const Divider(
@@ -127,53 +115,224 @@ class _DemoScreenState extends State<DemoScreen> {
                   ),
                 ),
               ],
-            );
-          }).toList(),
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.fruits[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.carBrands[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countries[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          List.generate(
+            20,
+            (index) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EachCell(
+                  text: CommonUtils.countryCodes[index],
+                  width: 100,
+                  height: 45,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: const Divider(
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
-        fixedColumnTitles: const ["S.no", 'A', 'B'],
-        columns: const [
+        scrollableColumnHeader: [
           EachCell(
             text: "Members",
-            width: 120,
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "A",
-            width: 50,
+            text: "Cities",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "B",
-            width: 50,
+            text: "Fruits",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "C",
-            width: 50,
+            text: "Cars",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
           EachCell(
-            text: "D",
-            width: 50,
+            text: "Countries",
+            width: 100,
+            textStyle: headerTextStyle,
+            isHeader: true,
+            isExpandable: true,
+          ),
+          EachCell(
+            text: "Codes",
+            textStyle: headerTextStyle,
+            width: 100,
             isHeader: true,
           ),
           EachCell(
-            text: "E",
-            width: 50,
+            text: "Random 1",
+            textStyle: headerTextStyle,
+            width: 100,
             isHeader: true,
           ),
           EachCell(
-            text: "F",
-            width: 50,
+            text: "Random 2",
+            textStyle: headerTextStyle,
+            width: 100,
             isHeader: true,
           ),
           EachCell(
-            text: "G",
-            width: 50,
+            text: "Random 3",
+            width: 100,
+            textStyle: headerTextStyle,
+            isHeader: true,
+          ),
+          EachCell(
+            text: "Random 4",
+            width: 100,
+            textStyle: headerTextStyle,
             isHeader: true,
           ),
         ],
-        fixedColumnWidths: const [40, 40, 40],
       ),
     );
   }

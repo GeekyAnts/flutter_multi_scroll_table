@@ -1,38 +1,124 @@
 import 'package:flutter/material.dart';
 
+/// A widget that represents a single cell in a table.
+/// It can be used for both header and data cells with various customization options.
 class EachCell extends StatelessWidget {
-  const EachCell(
-      {Key? key,
-      required this.text,
-      this.isHeader = false,
-      this.width,
-      this.height,
-      this.textStyle,
-      this.isLeftAlign = false})
-      : super(key: key);
+  /// Creates an [EachCell] widget.
+  ///
+  /// The [text] parameter must not be null.
+  const EachCell({
+    Key? key,
+    required this.text,
+    this.isHeader = false,
+    this.width,
+    this.height,
+    this.textStyle,
+    this.isLeftAlign = false,
+    this.backgroundColor,
+    this.padding,
+    this.border,
+    this.borderRadius,
+    this.margin,
+    this.isExpandable = false,
+  }) : super(key: key);
+
+  /// The text content of the cell.
   final String text;
+
+  /// Whether the cell is a header cell. Default is false.
   final bool isHeader;
 
+  /// Whether the text should be left-aligned. Default is false.
   final bool isLeftAlign;
+
+  /// The width of the cell.
   final double? width;
+
+  /// The height of the cell.
   final double? height;
+
+  /// The text style of the cell content.
   final TextStyle? textStyle;
+
+  /// The background color of the cell.
+  final Color? backgroundColor;
+
+  /// The padding inside the cell.
+  final EdgeInsetsGeometry? padding;
+
+  /// The margin outside the cell.
+  final EdgeInsetsGeometry? margin;
+
+  /// The border of the cell.
+  final BoxBorder? border;
+
+  /// The border radius of the cell.
+  final BorderRadiusGeometry? borderRadius;
+
+  /// Whether the cell is expandable. Default is false.
+  final bool isExpandable;
 
   @override
   Widget build(BuildContext context) {
-    double containerWidth = width ?? 50;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return Container(
+          height: height ?? 40,
+          alignment: isHeader ? Alignment.bottomCenter : Alignment.center,
+          padding: padding,
+          margin: margin,
+          decoration: BoxDecoration(
+            border: border,
+            color: backgroundColor,
+            borderRadius: borderRadius,
+          ),
+          width: constraints.maxWidth,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: constraints.maxWidth,
+            ),
+            child: Text(
+              text,
+              style:
+                  textStyle ?? const TextStyle(height: 1, color: Colors.black),
+              textAlign: isLeftAlign ? TextAlign.left : TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
-    return Container(
-        height: height ?? 45,
-        alignment: isHeader ? Alignment.bottomCenter : Alignment.center,
-        key: UniqueKey(),
-        width: containerWidth,
-        child: Text(text,
-            style: textStyle ??
-                const TextStyle(
-                  height: 1,
-                  color: Colors.black,
-                ),
-            textAlign: isLeftAlign ? TextAlign.left : TextAlign.center));
+extension EachCellCopyWith on EachCell {
+  EachCell copyWith({
+    String? text,
+    bool? isHeader,
+    bool? isLeftAlign,
+    double? width,
+    double? height,
+    TextStyle? textStyle,
+    Color? backgroundColor,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxBorder? border,
+    BorderRadiusGeometry? borderRadius,
+    bool? isExpandable,
+  }) {
+    return EachCell(
+      text: text ?? this.text,
+      isHeader: isHeader ?? this.isHeader,
+      isLeftAlign: isLeftAlign ?? this.isLeftAlign,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      textStyle: textStyle ?? this.textStyle,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      isExpandable: isExpandable ?? this.isExpandable,
+    );
   }
 }
