@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-
 import '../flutter_multi_scroll_table.dart';
 
 /// A widget that displays a multi-scrollable table with fixed and scrollable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
-  /// The header widgets for the scrollable columns.
-  final List<Widget> scrollableColumnHeader;
+  /// The header widgets for the columns.
+  final List<Widget> headers;
 
-  /// The children widgets for the scrollable columns.
-  final List<List<Widget>> scrollableColumnChildren;
+  /// The children widgets for the columns.
+  final List<List<Widget>> columnChildren;
 
-  /// The header widgets for the fixed columns.
-  final List<Widget> fixedColumnHeader;
-
-  /// The children widgets for the fixed columns.
-  final List<List<Widget>> fixedColumnChildren;
+  /// The number of fixed columns.
+  final int fixedCount;
 
   /// The total width of the table.
   final double totalWidth;
@@ -29,19 +25,17 @@ class FlutterMultiScrollTable extends StatefulWidget {
   final BoxBorder? tableBorder;
 
   /// [draggableIcon] is the icon displayed for dragging the column width.
-
   final Widget? draggableIcon;
 
   /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
-    required this.scrollableColumnHeader,
+    required this.headers,
+    required this.columnChildren,
+    required this.fixedCount,
     required this.totalWidth,
     this.height = 500,
-    required this.scrollableColumnChildren,
-    required this.fixedColumnChildren,
     this.isAscending = true,
-    required this.fixedColumnHeader,
     this.tableBorder,
     this.draggableIcon,
   });
@@ -101,8 +95,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   void _sortColumn() {
     setState(() {
       // Sort all fixed columns
-      for (int i = 0; i < widget.fixedColumnChildren.length; i++) {
-        widget.fixedColumnChildren[i].sort((a, b) {
+      for (int i = 0; i < widget.fixedCount; i++) {
+        widget.columnChildren[i].sort((a, b) {
           final textA = Utils.getTextFromWidget(a);
           final textB = Utils.getTextFromWidget(b);
           final comparisonResult = Utils.compareTexts(textA, textB);
@@ -111,8 +105,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
       }
 
       // Sort all scrollable columns
-      for (int i = 0; i < widget.scrollableColumnChildren.length; i++) {
-        widget.scrollableColumnChildren[i].sort((a, b) {
+      for (int i = widget.fixedCount; i < widget.columnChildren.length; i++) {
+        widget.columnChildren[i].sort((a, b) {
           final textA = Utils.getTextFromWidget(a);
           final textB = Utils.getTextFromWidget(b);
           final comparisonResult = Utils.compareTexts(textA, textB);
@@ -164,7 +158,9 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                       GestureDetector(
                         onTap: _sortColumn,
                         child: Row(
-                          children: widget.fixedColumnHeader.map((header) {
+                          children: widget.headers
+                              .take(widget.fixedCount)
+                              .map((header) {
                             final eachCell = header as EachCell;
 
                             return ResizableColumn(
@@ -173,8 +169,16 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                               isExpandable: eachCell.isExpandable,
                               isFixed: true,
                               draggableIcon: widget.draggableIcon,
-                              children: widget.fixedColumnChildren[
-                                  widget.fixedColumnHeader.indexOf(header)],
+                              children: widget.columnChildren[
+                                      widget.headers.indexOf(header)]
+                                  .map((child) {
+                                return Column(
+                                  children: [
+                                    child,
+                                    const Divider(height: 1),
+                                  ],
+                                );
+                              }).toList(),
                             );
                           }).toList(),
                         ),
@@ -190,7 +194,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 scrollDirection: Axis.horizontal,
                                 controller: _horizontalScrollController,
                                 child: Row(
-                                  children: widget.scrollableColumnHeader
+                                  children: widget.headers
+                                      .skip(widget.fixedCount)
                                       .map((header) {
                                     final eachCell = header as EachCell;
 
@@ -199,9 +204,16 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                       header: header,
                                       isExpandable: eachCell.isExpandable,
                                       draggableIcon: widget.draggableIcon,
-                                      children: widget.scrollableColumnChildren[
-                                          widget.scrollableColumnHeader
-                                              .indexOf(header)],
+                                      children: widget.columnChildren[
+                                              widget.headers.indexOf(header)]
+                                          .map((child) {
+                                        return Column(
+                                          children: [
+                                            child,
+                                            const Divider(height: 1),
+                                          ],
+                                        );
+                                      }).toList(),
                                     );
                                   }).toList(),
                                 ),

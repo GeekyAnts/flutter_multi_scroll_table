@@ -89,11 +89,8 @@ class _ResizableColumnState extends State<ResizableColumn> {
                     ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: const Divider(
-                  height: 1,
-                ),
+              const Divider(
+                height: 1,
               ),
             ],
           ),

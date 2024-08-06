@@ -77,12 +77,14 @@ class EachCell extends StatelessWidget {
             constraints: BoxConstraints(
               minWidth: constraints.maxWidth,
             ),
-            child: Text(
-              text,
-              style:
-                  textStyle ?? const TextStyle(height: 1, color: Colors.black),
-              textAlign: isLeftAlign ? TextAlign.left : TextAlign.center,
-              overflow: TextOverflow.visible,
+            child: Center(
+              child: Text(
+                text,
+                style: textStyle ??
+                    const TextStyle(height: 1, color: Colors.black),
+                textAlign: isLeftAlign ? TextAlign.left : TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
             ),
           ),
         );
