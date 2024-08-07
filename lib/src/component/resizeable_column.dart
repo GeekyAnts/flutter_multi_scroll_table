@@ -40,6 +40,12 @@ class _ResizableColumnState extends State<ResizableColumn> {
 
   @override
   Widget build(BuildContext context) {
+    Color? backgroundColor;
+
+    if (widget.header is EachCell) {
+      backgroundColor = (widget.header as EachCell).backgroundColor;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,48 +53,48 @@ class _ResizableColumnState extends State<ResizableColumn> {
           width: _width,
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: widget.header is EachCell
-                        ? (widget.header as EachCell).copyWith(width: _width)
-                        : widget.header,
-                  ),
-                  if (widget.isExpandable)
-                    MouseRegion(
-                      cursor: SystemMouseCursors.resizeLeftRight,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onHorizontalDragUpdate: (details) {
-                          print(
-                              'Dragging: ${details.delta.dx}'); // Debugging line
-                          setState(() {
-                            final newWidth = _width + details.delta.dx;
-
-                            // Ensure width does not exceed the available width
-
-                            if (widget.isFixed) {
-                              if (newWidth >= widget.initialWidth &&
-                                  newWidth <= widget.availableWidth) {
-                                _width = newWidth;
-                                widget.onWidthChanged(details.delta.dx);
-                              } else if (newWidth < widget.initialWidth) {
-                                _width = widget.initialWidth;
-                              }
-                            } else if (newWidth >= widget.initialWidth) {
-                              _width = newWidth;
-                            }
-                          });
-                        },
-                        child: widget.draggableIcon ??
-                            const Icon(
-                              Icons.chevron_right,
-                              size: 20,
-                              color: Colors.grey,
-                            ),
-                      ),
+              Container(
+                color: backgroundColor,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: widget.header is EachCell
+                          ? (widget.header as EachCell).copyWith(width: _width)
+                          : widget.header,
                     ),
-                ],
+                    if (widget.isExpandable)
+                      MouseRegion(
+                        cursor: SystemMouseCursors.resizeLeftRight,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onHorizontalDragUpdate: (details) {
+                            setState(() {
+                              final newWidth = _width + details.delta.dx;
+
+                              // Ensure width does not exceed the available width
+                              if (widget.isFixed) {
+                                if (newWidth >= widget.initialWidth &&
+                                    newWidth <= widget.availableWidth) {
+                                  _width = newWidth;
+                                  widget.onWidthChanged(details.delta.dx);
+                                } else if (newWidth < widget.initialWidth) {
+                                  _width = widget.initialWidth;
+                                }
+                              } else if (newWidth >= widget.initialWidth) {
+                                _width = newWidth;
+                              }
+                            });
+                          },
+                          child: widget.draggableIcon ??
+                              const Icon(
+                                Icons.chevron_right,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               const Divider(
                 height: 1,
