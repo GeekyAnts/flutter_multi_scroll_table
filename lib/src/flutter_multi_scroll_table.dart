@@ -1,33 +1,16 @@
 import 'package:flutter/material.dart';
 import '../flutter_multi_scroll_table.dart';
 
-/// A widget that displays a multi-scrollable table with fixed and scrollable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
-  /// The header widgets for the columns.
-  final List<Widget> headers;
-
-  /// The children widgets for the columns.
-  final List<List<Widget>> columnChildren;
-
-  /// The number of fixed columns.
+  final List<EachCell> headers;
+  final List<List<EachCell>> columnChildren;
   final int fixedCount;
-
-  /// The total width of the table.
   final double totalWidth;
-
-  /// The height of the table. Default is 500.
   final double? height;
-
-  /// Whether the sorting is in ascending order. Default is true.
   final bool isAscending;
-
-  /// The border for the table.
   final BoxBorder? tableBorder;
-
-  /// [draggableIcon] is the icon displayed for dragging the column width.
   final Widget? draggableIcon;
 
-  /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
     required this.headers,
@@ -52,6 +35,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   bool _isHorizontalScrolling = false;
   bool _isHeaderScrolling = false;
 
+  double _remainingWidth = 0;
+
   @override
   void initState() {
     _horizontalScrollController = ScrollController();
@@ -60,10 +45,16 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     _horizontalScrollController.addListener(_syncHorizontalScroll);
     _headerScrollController.addListener(_syncHeaderScroll);
+
     super.initState();
   }
 
-  /// Synchronizes the horizontal scroll position between the table body and the header.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateRemainingWidth();
+  }
+
   void _syncHorizontalScroll() {
     if (_isHeaderScrolling) return;
 
@@ -77,18 +68,56 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     _isHorizontalScrolling = false;
   }
 
-  /// Synchronizes the header scroll position with the horizontal scroll position of the table body.
   void _syncHeaderScroll() {
     if (_isHorizontalScrolling) return;
 
-    _isHeaderScrolling = true;
+    _isHorizontalScrolling = true;
 
     if (_headerScrollController.hasClients &&
         _horizontalScrollController.hasClients) {
       _horizontalScrollController.jumpTo(_headerScrollController.offset);
     }
 
-    _isHeaderScrolling = false;
+    _isHorizontalScrolling = false;
+  }
+
+  double getTotalFixedWidth() {
+    double totalWidth = 0;
+    for (var header in widget.headers.take(widget.fixedCount)) {
+      totalWidth += header.width ?? 100;
+    }
+    return totalWidth;
+  }
+
+  // void _updateRemainingWidth() {
+  //   double screenWidth = MediaQuery.of(context).size.width;
+  //   double totalFixedWidth = getTotalFixedWidth();
+  //   double usedWidth = widget.totalWidth - totalFixedWidth;
+  //   setState(() {
+  //     _remainingWidth = screenWidth - totalFixedWidth;
+  //   });
+  // }
+
+  void _updateRemainingWidth() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double totalFixedWidth = getTotalFixedWidth();
+    double usedWidth = widget.totalWidth - totalFixedWidth;
+
+    setState(() {
+      if (MediaQuery.of(context).orientation == Orientation.landscape) {
+        // In landscape mode, consider usedWidth for remaining width calculation
+        _remainingWidth = screenWidth - usedWidth;
+      } else {
+        // In portrait mode, remaining width is simply the screen width minus total fixed width
+        _remainingWidth = screenWidth - totalFixedWidth;
+      }
+    });
+  }
+
+  void _onWidthChanged(double widthChange) {
+    setState(() {
+      _updateRemainingWidth();
+    });
   }
 
   /// Sorts the columns based on the text content.
@@ -132,101 +161,112 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   Widget build(BuildContext context) {
     double adjustedHeight =
         MediaQuery.of(context).orientation == Orientation.landscape
-            ? MediaQuery.of(context).size.height *
-                0.8 // Adjust this value as needed
+            ? MediaQuery.of(context).size.height * 0.8
             : widget.height ?? 500;
+
+    _updateRemainingWidth();
 
     return SingleChildScrollView(
       child: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            border: widget.tableBorder ??
-                Border.all(width: 0.6, color: Colors.grey),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: adjustedHeight,
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  key: const Key("data"),
-                  scrollDirection: Axis.vertical,
-                  controller: _verticalScrollController,
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: _sortColumn,
-                        child: Row(
-                          children: widget.headers
-                              .take(widget.fixedCount)
-                              .map((header) {
-                            final eachCell = header as EachCell;
-
-                            return ResizableColumn(
-                              initialWidth: eachCell.width ?? 100,
-                              header: header,
-                              isExpandable: eachCell.isExpandable,
-                              isFixed: true,
-                              draggableIcon: widget.draggableIcon,
-                              children: widget.columnChildren[
-                                      widget.headers.indexOf(header)]
-                                  .map((child) {
-                                return Column(
-                                  children: [
-                                    child,
-                                    const Divider(height: 1),
-                                  ],
-                                );
-                              }).toList(),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      Flexible(
-                        child: GestureDetector(
+        child: Center(
+          child: Container(
+            width: widget.totalWidth,
+            decoration: BoxDecoration(
+              border: widget.tableBorder ??
+                  Border.all(width: 0.6, color: Colors.grey),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: adjustedHeight,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    key: const Key("data"),
+                    scrollDirection: Axis.vertical,
+                    controller: _verticalScrollController,
+                    child: Row(
+                      children: [
+                        GestureDetector(
                           onTap: _sortColumn,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                controller: _horizontalScrollController,
-                                child: Row(
-                                  children: widget.headers
-                                      .skip(widget.fixedCount)
-                                      .map((header) {
-                                    final eachCell = header as EachCell;
+                          child: Row(
+                            children: widget.headers
+                                .take(widget.fixedCount)
+                                .map((header) {
+                              final eachCell = header;
 
-                                    return ResizableColumn(
-                                      initialWidth: eachCell.width ?? 100,
-                                      header: header,
-                                      isExpandable: eachCell.isExpandable,
-                                      draggableIcon: widget.draggableIcon,
-                                      children: widget.columnChildren[
-                                              widget.headers.indexOf(header)]
-                                          .map((child) {
-                                        return Column(
-                                          children: [
-                                            child,
-                                            const Divider(height: 1),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ],
+                              return ResizableColumn(
+                                initialWidth: eachCell.width ?? 100,
+                                header: header,
+                                isExpandable: eachCell.isExpandable,
+                                isFixed: true,
+                                draggableIcon: widget.draggableIcon,
+                                maxWidth: MediaQuery.of(context).size.width,
+                                availableWidth: _remainingWidth,
+                                onWidthChanged: _onWidthChanged,
+                                children: widget.columnChildren[
+                                        widget.headers.indexOf(header)]
+                                    .map((child) {
+                                  return Column(
+                                    children: [
+                                      child,
+                                      const Divider(height: 1),
+                                    ],
+                                  );
+                                }).toList(),
+                              );
+                            }).toList(),
                           ),
                         ),
-                      ),
-                    ],
+                        Flexible(
+                          child: GestureDetector(
+                            onTap: _sortColumn,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  controller: _horizontalScrollController,
+                                  child: Row(
+                                    children: widget.headers
+                                        .skip(widget.fixedCount)
+                                        .map((header) {
+                                      final eachCell = header;
+
+                                      return ResizableColumn(
+                                        initialWidth: eachCell.width ?? 100,
+                                        header: header,
+                                        isExpandable: eachCell.isExpandable,
+                                        draggableIcon: widget.draggableIcon,
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width,
+                                        availableWidth: _remainingWidth,
+                                        onWidthChanged: _onWidthChanged,
+                                        children: widget.columnChildren[
+                                                widget.headers.indexOf(header)]
+                                            .map((child) {
+                                          return Column(
+                                            children: [
+                                              child,
+                                              const Divider(height: 1),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

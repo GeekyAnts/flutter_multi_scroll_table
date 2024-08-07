@@ -8,6 +8,9 @@ class ResizableColumn extends StatefulWidget {
   final bool isExpandable;
   final bool isFixed;
   final Widget? draggableIcon;
+  final double maxWidth;
+  final double availableWidth;
+  final Function(double) onWidthChanged;
 
   const ResizableColumn({
     Key? key,
@@ -17,6 +20,9 @@ class ResizableColumn extends StatefulWidget {
     required this.isExpandable,
     this.isFixed = false,
     this.draggableIcon,
+    required this.maxWidth,
+    required this.availableWidth,
+    required this.onWidthChanged,
   }) : super(key: key);
 
   @override
@@ -34,8 +40,6 @@ class _ResizableColumnState extends State<ResizableColumn> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width * 0.8;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -56,26 +60,23 @@ class _ResizableColumnState extends State<ResizableColumn> {
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onHorizontalDragUpdate: (details) {
+                          print(
+                              'Dragging: ${details.delta.dx}'); // Debugging line
                           setState(() {
                             final newWidth = _width + details.delta.dx;
 
+                            // Ensure width does not exceed the available width
+
                             if (widget.isFixed) {
-                              // Ensure the width does not exceed the screen width and is not less than the initial width when isFixed is true
                               if (newWidth >= widget.initialWidth &&
-                                  newWidth <= screenWidth) {
+                                  newWidth <= widget.availableWidth) {
                                 _width = newWidth;
-                              } else if (newWidth > screenWidth) {
-                                _width = screenWidth;
+                                widget.onWidthChanged(details.delta.dx);
                               } else if (newWidth < widget.initialWidth) {
                                 _width = widget.initialWidth;
                               }
-                            } else {
-                              // Ensure the width is not less than the initial width when isFixed is false
-                              if (newWidth >= widget.initialWidth) {
-                                _width = newWidth;
-                              } else {
-                                _width = widget.initialWidth;
-                              }
+                            } else if (newWidth >= widget.initialWidth) {
+                              _width = newWidth;
                             }
                           });
                         },
@@ -100,11 +101,8 @@ class _ResizableColumnState extends State<ResizableColumn> {
           children: widget.children.map((child) {
             return SizedBox(
               width: _width,
-              child: child is EachCell
-                  ? (child).copyWith(
-                      width: _width,
-                    )
-                  : child,
+              child:
+                  child is EachCell ? (child).copyWith(width: _width) : child,
             );
           }).toList(),
         ),
