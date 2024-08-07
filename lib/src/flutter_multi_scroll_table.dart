@@ -1,16 +1,34 @@
 import 'package:flutter/material.dart';
 import '../flutter_multi_scroll_table.dart';
 
+/// A widget that represents a multi-scrollable table with resizable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
+  /// The headers of the table, represented as a list of [EachCell] widgets.
   final List<EachCell> headers;
+
+  /// The children of each column, represented as a list of lists of [EachCell] widgets.
   final List<List<EachCell>> columnChildren;
+
+  /// The number of fixed columns that will not scroll horizontally.
   final int fixedCount;
+
+  /// The total width of the table.
   final double totalWidth;
+
+  /// The height of the table. Defaults to 500.
   final double? height;
+
+  /// A flag indicating if the columns should be sorted in ascending order.
+  /// Defaults to true.
   final bool isAscending;
+
+  /// The border style of the table.
   final BoxBorder? tableBorder;
+
+  /// A widget to use as the draggable icon for resizable columns.
   final Widget? draggableIcon;
 
+  /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
     required this.headers,
@@ -33,7 +51,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   late ScrollController _headerScrollController;
   late ScrollController _verticalScrollController;
   bool _isHorizontalScrolling = false;
-  bool _isHeaderScrolling = false;
+  final bool _isHeaderScrolling = false;
 
   double _remainingWidth = 0;
 
@@ -88,15 +106,6 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     }
     return totalWidth;
   }
-
-  // void _updateRemainingWidth() {
-  //   double screenWidth = MediaQuery.of(context).size.width;
-  //   double totalFixedWidth = getTotalFixedWidth();
-  //   double usedWidth = widget.totalWidth - totalFixedWidth;
-  //   setState(() {
-  //     _remainingWidth = screenWidth - totalFixedWidth;
-  //   });
-  // }
 
   void _updateRemainingWidth() {
     double screenWidth = MediaQuery.of(context).size.width;
