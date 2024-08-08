@@ -129,6 +129,30 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     });
   }
 
+  /// Ensures all columns have the same number of children as there are headers.
+  List<List<EachCell>> _normalizeColumnChildren() {
+    List<List<EachCell>> normalizedColumnChildren = [];
+
+    for (int i = 0; i < widget.headers.length; i++) {
+      if (i < widget.columnChildren.length) {
+        normalizedColumnChildren.add(widget.columnChildren[i]);
+      } else {
+        normalizedColumnChildren.add(
+          List.generate(
+            widget.columnChildren[0].length,
+            (_) => EachCell(
+              text: '',
+              width: widget.headers[i].width,
+              height: widget.columnChildren[0][0].height,
+            ),
+          ),
+        );
+      }
+    }
+
+    return normalizedColumnChildren;
+  }
+
   /// Sorts the columns based on the text content.
   void _sortColumn() {
     setState(() {
@@ -175,6 +199,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     _updateRemainingWidth();
 
+    final normalizedColumnChildren = _normalizeColumnChildren();
+
     return SingleChildScrollView(
       child: SafeArea(
         child: Center(
@@ -213,7 +239,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 maxWidth: MediaQuery.of(context).size.width,
                                 availableWidth: _remainingWidth,
                                 onWidthChanged: _onWidthChanged,
-                                children: widget.columnChildren[
+                                children: normalizedColumnChildren[
                                         widget.headers.indexOf(header)]
                                     .map((child) {
                                   return Column(
@@ -252,7 +278,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                             MediaQuery.of(context).size.width,
                                         availableWidth: _remainingWidth,
                                         onWidthChanged: _onWidthChanged,
-                                        children: widget.columnChildren[
+                                        children: normalizedColumnChildren[
                                                 widget.headers.indexOf(header)]
                                             .map((child) {
                                           return Column(

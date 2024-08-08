@@ -20,7 +20,7 @@ class _DemoScreenState extends State<DemoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Combine headers into a single list
+    // Column Headers list
     final headers = [
       EachCell(
         text: "Sr. No",
@@ -39,6 +39,7 @@ class _DemoScreenState extends State<DemoScreen> {
         text: "Members",
         width: 100,
         textStyle: headerTextStyle,
+        isExpandable: true,
         isHeader: true,
       ),
       EachCell(
@@ -97,6 +98,8 @@ class _DemoScreenState extends State<DemoScreen> {
         isHeader: true,
       ),
     ];
+
+    // Column Children list
 
     final columnChildren = [
       _numbers.map((number) {
@@ -203,7 +206,7 @@ class _DemoScreenState extends State<DemoScreen> {
         height: 480,
         headers: headers,
         columnChildren: columnChildren,
-        fixedCount: 2,
+        fixedCount: 3,
       ),
     );
   }
