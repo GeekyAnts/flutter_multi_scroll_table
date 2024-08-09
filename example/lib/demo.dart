@@ -18,6 +18,8 @@ class _DemoScreenState extends State<DemoScreen> {
   final TextStyle? headerTextStyle =
       const TextStyle(fontWeight: FontWeight.bold);
 
+  final TextStyle? dataTextStyle = const TextStyle(fontWeight: FontWeight.w200);
+
   @override
   Widget build(BuildContext context) {
     // Column Headers list
@@ -25,177 +27,101 @@ class _DemoScreenState extends State<DemoScreen> {
       EachCell(
         text: "Sr. No",
         width: 60,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
+        dataBackgroundColor: Colors.amber,
+        headerBackgroundColor: Colors.blue,
         isHeader: true,
       ),
       EachCell(
         text: "Random",
         width: 90,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
         isExpandable: true,
       ),
       EachCell(
         text: "Members",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isExpandable: true,
         isHeader: true,
       ),
       EachCell(
         text: "Cities",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Fruits",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Cars",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Countries",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
         isExpandable: true,
       ),
       EachCell(
         text: "Codes",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 1",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 2",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
+        dataTextStyle:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        headerBackgroundColor: Colors.orange,
+        dataBackgroundColor: Colors.red,
         isHeader: true,
       ),
       EachCell(
         text: "Random 3",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 4",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
     ];
 
-    // Column Children list
+    // ColumnChildren list
 
     final columnChildren = [
-      _numbers.map((number) {
-        return EachCell(
-          text: number.toString(),
-          width: 80,
-          height: 45,
-        );
-      }).toList(),
-      _randomAlphabets.map((number) {
-        return EachCell(
-          text: number.toString(),
-          width: 90,
-          height: 45,
-        );
-      }).toList(),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.names[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.cities[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.fruits[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.carBrands[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countries[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
+      _numbers,
+      _randomAlphabets,
+      CommonUtils.names,
+      CommonUtils.cities,
+      CommonUtils.fruits,
+      CommonUtils.carBrands,
+      CommonUtils.countries,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes
     ];
 
     return Scaffold(
@@ -206,7 +132,7 @@ class _DemoScreenState extends State<DemoScreen> {
         height: 480,
         headers: headers,
         columnChildren: columnChildren,
-        fixedCount: 3,
+        fixedCount: 1,
       ),
     );
   }

@@ -1,34 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_multi_scroll_table/src/utils/utils.dart';
+
 import '../flutter_multi_scroll_table.dart';
 
-/// A widget that represents a multi-scrollable table with resizable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
-  /// The headers of the table, represented as a list of [EachCell] widgets.
   final List<EachCell> headers;
-
-  /// The children of each column, represented as a list of lists of [EachCell] widgets.
-  final List<List<EachCell>> columnChildren;
-
-  /// The number of fixed columns that will not scroll horizontally.
+  final List<List<dynamic>> columnChildren;
   final int fixedCount;
-
-  /// The total width of the table.
   final double totalWidth;
-
-  /// The height of the table. Defaults to 500.
   final double? height;
-
-  /// A flag indicating if the columns should be sorted in ascending order.
-  /// Defaults to true.
   final bool isAscending;
-
-  /// The border style of the table.
   final BoxBorder? tableBorder;
-
-  /// A widget to use as the draggable icon for resizable columns.
   final Widget? draggableIcon;
 
-  /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
     required this.headers,
@@ -63,6 +47,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     _horizontalScrollController.addListener(_syncHorizontalScroll);
     _headerScrollController.addListener(_syncHeaderScroll);
+    //  _sortHeadersByPriority();
 
     super.initState();
   }
@@ -114,10 +99,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     setState(() {
       if (MediaQuery.of(context).orientation == Orientation.landscape) {
-        // In landscape mode, consider usedWidth for remaining width calculation
         _remainingWidth = screenWidth - usedWidth;
       } else {
-        // In portrait mode, remaining width is simply the screen width minus total fixed width
         _remainingWidth = screenWidth - totalFixedWidth;
       }
     });
@@ -129,48 +112,82 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     });
   }
 
-  /// Ensures all columns have the same number of children as there are headers.
-  List<List<EachCell>> _normalizeColumnChildren() {
-    List<List<EachCell>> normalizedColumnChildren = [];
+  List<List<EachCell>> _generateColumnChildrenWithStyles() {
+    List<List<EachCell>> styledColumnChildren = [];
 
     for (int i = 0; i < widget.headers.length; i++) {
+      List<EachCell> column = [];
+      TextStyle? textStyle = widget.headers[i].dataTextStyle;
+      Color? backgroundColor = widget.headers[i].dataBackgroundColor;
+      double? width = widget.headers[i].width;
+      double? height = widget.headers[i].height;
+
       if (i < widget.columnChildren.length) {
-        normalizedColumnChildren.add(widget.columnChildren[i]);
-      } else {
-        normalizedColumnChildren.add(
-          List.generate(
-            widget.columnChildren[0].length,
-            (_) => EachCell(
-              text: '',
-              width: widget.headers[i].width,
-              height: widget.columnChildren[0][0].height,
+        for (dynamic data in widget.columnChildren[i]) {
+          String text = data.toString();
+          column.add(
+            EachCell(
+              text: text,
+              width: width,
+              height: height,
+              dataTextStyle: textStyle,
+              dataBackgroundColor: backgroundColor,
             ),
-          ),
-        );
+          );
+        }
       }
+      styledColumnChildren.add(column);
     }
 
-    return normalizedColumnChildren;
+    return styledColumnChildren;
   }
 
-  /// Sorts the columns based on the text content.
+  void _sortHeadersByPriority() {
+    List<MapEntry<EachCell, List<dynamic>>> headersWithColumns = [];
+
+    for (int i = 0; i < widget.headers.length; i++) {
+      headersWithColumns
+          .add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+    }
+
+    // Sort by priority, with null priorities treated as a large value (so they go last)
+    headersWithColumns.sort((a, b) {
+      int priorityA =
+          a.key.priority ?? 9999; // default to a large value if null
+      int priorityB = b.key.priority ?? 9999;
+      return priorityA.compareTo(priorityB);
+    });
+
+    // Update headers and columnChildren in the widget
+    setState(() {
+      widget.headers
+        ..clear()
+        ..addAll(headersWithColumns.map((entry) => entry.key));
+      widget.columnChildren
+        ..clear()
+        ..addAll(headersWithColumns.map((entry) => entry.value));
+    });
+  }
+
   void _sortColumn() {
     setState(() {
-      // Sort all fixed columns
       for (int i = 0; i < widget.fixedCount; i++) {
         widget.columnChildren[i].sort((a, b) {
-          final textA = Utils.getTextFromWidget(a);
-          final textB = Utils.getTextFromWidget(b);
+          final textA = Utils.getTextFromWidget(
+              a is EachCell ? a : EachCell(text: a.toString()));
+          final textB = Utils.getTextFromWidget(
+              b is EachCell ? b : EachCell(text: b.toString()));
           final comparisonResult = Utils.compareTexts(textA, textB);
           return widget.isAscending ? comparisonResult : -comparisonResult;
         });
       }
 
-      // Sort all scrollable columns
       for (int i = widget.fixedCount; i < widget.columnChildren.length; i++) {
         widget.columnChildren[i].sort((a, b) {
-          final textA = Utils.getTextFromWidget(a);
-          final textB = Utils.getTextFromWidget(b);
+          final textA = Utils.getTextFromWidget(
+              a is EachCell ? a : EachCell(text: a.toString()));
+          final textB = Utils.getTextFromWidget(
+              b is EachCell ? b : EachCell(text: b.toString()));
           final comparisonResult = Utils.compareTexts(textA, textB);
           return widget.isAscending ? comparisonResult : -comparisonResult;
         });
@@ -199,7 +216,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     _updateRemainingWidth();
 
-    final normalizedColumnChildren = _normalizeColumnChildren();
+    final styledColumnChildren = _generateColumnChildrenWithStyles();
 
     return SingleChildScrollView(
       child: SafeArea(
@@ -239,7 +256,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 maxWidth: MediaQuery.of(context).size.width,
                                 availableWidth: _remainingWidth,
                                 onWidthChanged: _onWidthChanged,
-                                children: normalizedColumnChildren[
+                                children: styledColumnChildren[
                                         widget.headers.indexOf(header)]
                                     .map((child) {
                                   return Column(
@@ -278,7 +295,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                             MediaQuery.of(context).size.width,
                                         availableWidth: _remainingWidth,
                                         onWidthChanged: _onWidthChanged,
-                                        children: normalizedColumnChildren[
+                                        children: styledColumnChildren[
                                                 widget.headers.indexOf(header)]
                                             .map((child) {
                                           return Column(

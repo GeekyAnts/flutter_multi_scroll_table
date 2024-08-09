@@ -12,14 +12,17 @@ class EachCell extends StatelessWidget {
     this.isHeader = false,
     this.width,
     this.height,
-    this.textStyle,
+    this.headerTextStyle,
+    this.dataTextStyle,
     this.isLeftAlign = false,
-    this.backgroundColor,
+    this.headerBackgroundColor,
+    this.dataBackgroundColor,
     this.padding,
     this.border,
     this.borderRadius,
     this.margin,
     this.isExpandable = false,
+    this.priority,
   }) : super(key: key);
 
   /// The text content of the cell.
@@ -37,11 +40,17 @@ class EachCell extends StatelessWidget {
   /// The height of the cell.
   final double? height;
 
-  /// The text style of the cell content.
-  final TextStyle? textStyle;
+  ///  The text style for the header of cell content.
+  final TextStyle? headerTextStyle;
 
-  /// The background color of the cell.
-  final Color? backgroundColor;
+  /// The text style for the data of cell content.
+  final TextStyle? dataTextStyle;
+
+  /// The background color for header the cell.
+  final Color? headerBackgroundColor;
+
+  /// The background color for data of the cell.
+  final Color? dataBackgroundColor;
 
   /// The padding inside the cell.
   final EdgeInsetsGeometry? padding;
@@ -58,6 +67,8 @@ class EachCell extends StatelessWidget {
   /// Whether the cell is expandable. Default is false.
   final bool isExpandable;
 
+  final int? priority;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -69,7 +80,7 @@ class EachCell extends StatelessWidget {
           margin: margin,
           decoration: BoxDecoration(
             border: border,
-            color: backgroundColor,
+            color: isHeader ? headerBackgroundColor : dataBackgroundColor,
             borderRadius: borderRadius,
           ),
           width: constraints.maxWidth,
@@ -80,7 +91,8 @@ class EachCell extends StatelessWidget {
             child: Center(
               child: Text(
                 text,
-                style: textStyle ??
+                style: headerTextStyle ??
+                    dataTextStyle ??
                     const TextStyle(height: 1, color: Colors.black),
                 textAlign: isLeftAlign ? TextAlign.left : TextAlign.center,
                 overflow: TextOverflow.visible,
@@ -100,8 +112,10 @@ extension EachCellCopyWith on EachCell {
     bool? isLeftAlign,
     double? width,
     double? height,
-    TextStyle? textStyle,
-    Color? backgroundColor,
+    TextStyle? headerTextStyle,
+    TextStyle? dataTextStyle,
+    Color? headerBackgroundColor,
+    Color? dataBackgroundColor,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     BoxBorder? border,
@@ -114,8 +128,10 @@ extension EachCellCopyWith on EachCell {
       isLeftAlign: isLeftAlign ?? this.isLeftAlign,
       width: width ?? this.width,
       height: height ?? this.height,
-      textStyle: textStyle ?? this.textStyle,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
+      headerTextStyle: headerTextStyle ?? this.headerTextStyle,
+      headerBackgroundColor:
+          headerBackgroundColor ?? this.headerBackgroundColor,
+      dataBackgroundColor: dataBackgroundColor ?? this.dataBackgroundColor,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
       border: border ?? this.border,

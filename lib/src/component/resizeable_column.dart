@@ -40,10 +40,13 @@ class _ResizableColumnState extends State<ResizableColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Color? backgroundColor;
+    Color? headerBackgroundColor;
+    Color? dataBackgroundColor;
 
     if (widget.header is EachCell) {
-      backgroundColor = (widget.header as EachCell).backgroundColor;
+      final eachCellHeader = widget.header as EachCell;
+      headerBackgroundColor = eachCellHeader.headerBackgroundColor;
+      dataBackgroundColor = eachCellHeader.dataBackgroundColor;
     }
 
     return Column(
@@ -54,7 +57,7 @@ class _ResizableColumnState extends State<ResizableColumn> {
           child: Column(
             children: [
               Container(
-                color: backgroundColor,
+                color: headerBackgroundColor,
                 child: Row(
                   children: [
                     Expanded(
@@ -107,8 +110,12 @@ class _ResizableColumnState extends State<ResizableColumn> {
           children: widget.children.map((child) {
             return SizedBox(
               width: _width,
-              child:
-                  child is EachCell ? (child).copyWith(width: _width) : child,
+              child: child is EachCell
+                  ? child.copyWith(
+                      width: _width,
+                      dataBackgroundColor: dataBackgroundColor,
+                    )
+                  : child,
             );
           }).toList(),
         ),
