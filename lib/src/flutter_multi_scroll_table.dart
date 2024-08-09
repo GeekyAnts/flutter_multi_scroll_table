@@ -47,7 +47,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     _horizontalScrollController.addListener(_syncHorizontalScroll);
     _headerScrollController.addListener(_syncHeaderScroll);
-    //  _sortHeadersByPriority();
+    _sortHeadersByPriority();
 
     super.initState();
   }
@@ -143,30 +143,53 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   }
 
   void _sortHeadersByPriority() {
-    List<MapEntry<EachCell, List<dynamic>>> headersWithColumns = [];
-
-    for (int i = 0; i < widget.headers.length; i++) {
-      headersWithColumns
-          .add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+    // Set default priorities for headers that don't have one
+    for (var i = 0; i < widget.headers.length; i++) {
+      if (widget.headers[i].priority == null) {
+        widget.headers[i] = widget.headers[i].copyWith(
+          priority: i,
+        );
+      }
     }
 
-    // Sort by priority, with null priorities treated as a large value (so they go last)
-    headersWithColumns.sort((a, b) {
-      int priorityA =
-          a.key.priority ?? 9999; // default to a large value if null
-      int priorityB = b.key.priority ?? 9999;
+    // Adjust priorities if any are out of bounds
+    for (var i = 0; i < widget.headers.length; i++) {
+      if (widget.headers[i].priority != null) {
+        if (widget.headers[i].priority! >= widget.headers.length) {
+          widget.headers[i] = widget.headers[i].copyWith(
+            priority: widget.headers.length,
+          );
+        } else if (widget.headers[i].priority! < 0) {
+          widget.headers[i] = widget.headers[i].copyWith(
+            priority: 0,
+          );
+        }
+      }
+    }
+
+    // Combine headers with their columns
+    List<MapEntry<EachCell, List<dynamic>>> combined = [];
+    for (int i = 0; i < widget.headers.length; i++) {
+      combined.add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+    }
+
+    // Sort based on priority
+    combined.sort((a, b) {
+      int priorityA = a.key.priority ?? widget.headers.indexOf(a.key);
+      int priorityB = b.key.priority ?? widget.headers.indexOf(b.key);
       return priorityA.compareTo(priorityB);
     });
 
-    // Update headers and columnChildren in the widget
-    setState(() {
-      widget.headers
-        ..clear()
-        ..addAll(headersWithColumns.map((entry) => entry.key));
-      widget.columnChildren
-        ..clear()
-        ..addAll(headersWithColumns.map((entry) => entry.value));
-    });
+    // Update headers and columnChildren after sorting
+    widget.headers.clear();
+    widget.columnChildren.clear();
+
+    for (var entry in combined) {
+      widget.headers.add(entry.key);
+      widget.columnChildren.add(entry.value);
+    }
+
+    setState(() {});
   }
 
   void _sortColumn() {

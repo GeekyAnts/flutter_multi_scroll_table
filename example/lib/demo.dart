@@ -28,8 +28,6 @@ class _DemoScreenState extends State<DemoScreen> {
         text: "Sr. No",
         width: 60,
         headerTextStyle: headerTextStyle,
-        dataBackgroundColor: Colors.amber,
-        headerBackgroundColor: Colors.blue,
         isHeader: true,
       ),
       EachCell(
@@ -44,6 +42,7 @@ class _DemoScreenState extends State<DemoScreen> {
         width: 100,
         headerTextStyle: headerTextStyle,
         isExpandable: true,
+        priority: 0,
         isHeader: true,
       ),
       EachCell(
@@ -89,8 +88,6 @@ class _DemoScreenState extends State<DemoScreen> {
         headerTextStyle: headerTextStyle,
         dataTextStyle:
             const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        headerBackgroundColor: Colors.orange,
-        dataBackgroundColor: Colors.red,
         isHeader: true,
       ),
       EachCell(
@@ -132,7 +129,7 @@ class _DemoScreenState extends State<DemoScreen> {
         height: 480,
         headers: headers,
         columnChildren: columnChildren,
-        fixedCount: 1,
+        fixedCount: 2,
       ),
     );
   }

@@ -121,6 +121,7 @@ extension EachCellCopyWith on EachCell {
     BoxBorder? border,
     BorderRadiusGeometry? borderRadius,
     bool? isExpandable,
+    int? priority,
   }) {
     return EachCell(
       text: text ?? this.text,
@@ -137,6 +138,7 @@ extension EachCellCopyWith on EachCell {
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
       isExpandable: isExpandable ?? this.isExpandable,
+      priority: priority ?? this.priority,
     );
   }
 }
