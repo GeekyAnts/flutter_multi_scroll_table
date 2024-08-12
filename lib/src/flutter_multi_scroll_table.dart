@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/src/utils/utils.dart';
-
 import '../flutter_multi_scroll_table.dart';
 
 class FlutterMultiScrollTable extends StatefulWidget {
@@ -12,6 +11,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
   final bool isAscending;
   final BoxBorder? tableBorder;
   final Widget? draggableIcon;
+  final void Function(int, List<dynamic>)? onGenerateRowConfiguration;
 
   const FlutterMultiScrollTable({
     super.key,
@@ -23,6 +23,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.isAscending = true,
     this.tableBorder,
     this.draggableIcon,
+    this.onGenerateRowConfiguration,
   });
 
   @override
@@ -38,6 +39,9 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   final bool _isHeaderScrolling = false;
 
   double _remainingWidth = 0;
+
+  // Store styles for EachCell
+  final Map<int, Map<int, EachCell>> _rowConfigurations = {};
 
   @override
   void initState() {
@@ -112,6 +116,30 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     });
   }
 
+  void _applyRowConfigurations(List<List<EachCell>> columnChildren) {
+    for (int rowIndex = 0; rowIndex < columnChildren[0].length; rowIndex++) {
+      if (widget.onGenerateRowConfiguration != null) {
+        List<dynamic> rowChildren =
+            columnChildren.map((col) => col[rowIndex]).toList();
+
+        // Apply configurations
+        widget.onGenerateRowConfiguration!(
+          rowIndex,
+          rowChildren,
+        );
+
+        // Extract and store row configurations
+        _rowConfigurations[rowIndex] = {};
+        for (int colIndex = 0; colIndex < rowChildren.length; colIndex++) {
+          if (rowChildren[colIndex] is EachCell) {
+            _rowConfigurations[rowIndex]![colIndex] =
+                rowChildren[colIndex] as EachCell;
+          }
+        }
+      }
+    }
+  }
+
   List<List<EachCell>> _generateColumnChildrenWithStyles() {
     List<List<EachCell>> styledColumnChildren = [];
 
@@ -123,27 +151,29 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
       double? height = widget.headers[i].height;
 
       if (i < widget.columnChildren.length) {
-        for (dynamic data in widget.columnChildren[i]) {
+        for (int j = 0; j < widget.columnChildren[i].length; j++) {
+          dynamic data = widget.columnChildren[i][j];
           String text = data.toString();
-          column.add(
-            EachCell(
-              text: text,
-              width: width,
-              height: height,
-              dataTextStyle: textStyle,
-              dataBackgroundColor: backgroundColor,
-            ),
+          EachCell cell = EachCell(
+            text: text,
+            width: width,
+            height: height,
+            dataTextStyle: textStyle,
+            dataBackgroundColor: backgroundColor,
           );
+          column.add(cell);
         }
       }
       styledColumnChildren.add(column);
     }
 
+    // Apply row configurations here
+    _applyRowConfigurations(styledColumnChildren);
+
     return styledColumnChildren;
   }
 
   void _sortHeadersByPriority() {
-    // Set default priorities for headers that don't have one
     for (var i = 0; i < widget.headers.length; i++) {
       if (widget.headers[i].priority == null) {
         widget.headers[i] = widget.headers[i].copyWith(
@@ -152,7 +182,6 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
       }
     }
 
-    // Adjust priorities if any are out of bounds
     for (var i = 0; i < widget.headers.length; i++) {
       if (widget.headers[i].priority != null) {
         if (widget.headers[i].priority! >= widget.headers.length) {
@@ -166,20 +195,17 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         }
       }
     }
-
     // Combine headers with their columns
     List<MapEntry<EachCell, List<dynamic>>> combined = [];
     for (int i = 0; i < widget.headers.length; i++) {
       combined.add(MapEntry(widget.headers[i], widget.columnChildren[i]));
     }
-
     // Sort based on priority
     combined.sort((a, b) {
       int priorityA = a.key.priority ?? widget.headers.indexOf(a.key);
       int priorityB = b.key.priority ?? widget.headers.indexOf(b.key);
       return priorityA.compareTo(priorityB);
     });
-
     // Update headers and columnChildren after sorting
     widget.headers.clear();
     widget.columnChildren.clear();
@@ -239,7 +265,31 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     _updateRemainingWidth();
 
-    final styledColumnChildren = _generateColumnChildrenWithStyles();
+    final List<List<EachCell>> styledColumnChildren =
+        _generateColumnChildrenWithStyles();
+
+    // Apply onGenerateRowConfiguration for each row
+    for (int rowIndex = 0;
+        rowIndex < styledColumnChildren[0].length;
+        rowIndex++) {
+      if (widget.onGenerateRowConfiguration != null) {
+        List<dynamic> rowChildren =
+            styledColumnChildren.map((col) => col[rowIndex]).toList();
+
+        widget.onGenerateRowConfiguration!(
+          rowIndex,
+          rowChildren,
+        );
+      }
+    }
+
+    _rowConfigurations.forEach((rowIndex, columnMap) {
+      print('Row $rowIndex:');
+      columnMap.forEach((colIndex, eachCell) {
+        //  print('  Column $colIndex: ${eachCell.dataBackgroundColor}');
+        print('  Column text $colIndex: ${eachCell.dataTextStyle}');
+      });
+    });
 
     return SingleChildScrollView(
       child: SafeArea(
@@ -282,9 +332,31 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 children: styledColumnChildren[
                                         widget.headers.indexOf(header)]
                                     .map((child) {
+                                  // Get the row index and column index for the child
+                                  final columnIndex = styledColumnChildren
+                                      .indexOf(styledColumnChildren.firstWhere(
+                                          (col) => col.contains(child)));
+                                  final rowIndex = styledColumnChildren
+                                      .firstWhere((col) => col.contains(child))
+                                      .indexOf(child);
+
+                                  // Apply styles from _rowConfigurations
+                                  final rowConfig =
+                                      _rowConfigurations[rowIndex];
+                                  final EachCell? rowCell =
+                                      rowConfig?[columnIndex];
+
                                   return Column(
                                     children: [
-                                      child,
+                                      child.copyWith(
+                                        dataBackgroundColor:
+                                            rowCell?.dataBackgroundColor,
+                                        headerBackgroundColor:
+                                            rowCell?.headerBackgroundColor,
+                                        dataTextStyle: rowCell?.dataTextStyle,
+                                        width: rowCell?.width ?? child.width,
+                                        height: rowCell?.height ?? child.height,
+                                      ),
                                       const Divider(height: 1),
                                     ],
                                   );
@@ -321,9 +393,35 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                         children: styledColumnChildren[
                                                 widget.headers.indexOf(header)]
                                             .map((child) {
+                                          // Get the row index and column index for the child
+                                          final columnIndex =
+                                              styledColumnChildren.indexOf(
+                                                  styledColumnChildren
+                                                      .firstWhere((col) =>
+                                                          col.contains(child)));
+                                          final rowIndex = styledColumnChildren
+                                              .firstWhere(
+                                                  (col) => col.contains(child))
+                                              .indexOf(child);
+
+                                          // Apply styles from _rowConfigurations
+                                          final rowConfig =
+                                              _rowConfigurations[rowIndex];
+                                          final EachCell? rowCell =
+                                              rowConfig?[columnIndex];
+
                                           return Column(
                                             children: [
-                                              child,
+                                              child.copyWith(
+                                                dataBackgroundColor: rowCell
+                                                    ?.dataBackgroundColor,
+                                                dataTextStyle:
+                                                    rowCell?.dataTextStyle,
+                                                width: rowCell?.width ??
+                                                    child.width,
+                                                height: rowCell?.height ??
+                                                    child.height,
+                                              ),
                                               const Divider(height: 1),
                                             ],
                                           );
