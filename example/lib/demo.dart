@@ -13,7 +13,9 @@ class _DemoScreenState extends State<DemoScreen> {
   final TextStyle? headerTextStyle =
       const TextStyle(fontWeight: FontWeight.bold);
 
-  final TextStyle? dataTextStyle = const TextStyle(fontWeight: FontWeight.w200);
+  final TextStyle? dataTextStyle = const TextStyle(
+    fontWeight: FontWeight.w200,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -126,10 +128,10 @@ class _DemoScreenState extends State<DemoScreen> {
           if (rowIndex == 3) {
             for (int i = 0; i < rowChildren.length; i++) {
               rowChildren[i] = (rowChildren[i]).copyWith(
-                  dataBackgroundColor: Colors.amber,
+                  dataBackgroundColor: Colors.blueAccent,
                   dataTextStyle: const TextStyle(
-                      color: Color.fromARGB(255, 43, 59, 71),
-                      fontWeight: FontWeight.bold));
+                    color: Colors.white,
+                  ));
             }
           }
         },

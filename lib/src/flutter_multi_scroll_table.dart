@@ -2,17 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/src/utils/utils.dart';
 import '../flutter_multi_scroll_table.dart';
 
+/// A widget that represents a multi-scrollable table with resizable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
+  /// A list of header cells for the table. Each header is an `EachCell` widget.
   final List<EachCell> headers;
+
+  /// A 2D list representing the data for each column. The outer list represents columns,
+  /// and each inner list represents the data for each cell in that column.
   final List<List<dynamic>> columnChildren;
+
+  /// The number of columns that should remain fixed when horizontally scrolling.
   final int fixedCount;
+
+  /// The total width of the table, including all columns.
   final double totalWidth;
+
+  /// The height of the table. Defaults to 500 if not provided.
   final double? height;
+
+  /// Indicates whether the columns should be sorted in ascending order.
   final bool isAscending;
+
+  /// The text style to be applied to all the header cells.
+  final TextStyle? headerTextStyle;
+
+  /// The text style to be applied to all the data cells.
+  final TextStyle? dataTextStyle;
+
+  /// The border for the entire table. Defaults to a grey border if not provided.
   final BoxBorder? tableBorder;
+
+  /// A custom widget to use as the draggable icon for resizing columns.
   final Widget? draggableIcon;
+
+  /// A callback function that allows dynamic configuration of rows based on their index.
+  /// It takes the row index and a list of `EachCell` widgets representing the row as parameters.
+
   final void Function(int, List<EachCell>)? onGenerateRowConfiguration;
 
+  /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
     required this.headers,
@@ -24,6 +52,8 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.tableBorder,
     this.draggableIcon,
     this.onGenerateRowConfiguration,
+    this.headerTextStyle,
+    this.dataTextStyle,
   });
 
   @override
@@ -142,7 +172,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     for (int i = 0; i < widget.headers.length; i++) {
       List<EachCell> column = [];
-      TextStyle? textStyle = widget.headers[i].dataTextStyle;
+      TextStyle? textStyle = widget.dataTextStyle;
       Color? backgroundColor = widget.headers[i].dataBackgroundColor;
       double? width = widget.headers[i].width;
       double? height = widget.headers[i].height;
@@ -336,10 +366,21 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 .take(widget.fixedCount)
                                 .map((header) {
                               final eachCell = header;
+                              final headerTextStyle = widget.headerTextStyle ??
+                                  eachCell.headerTextStyle;
+                              final dataTextStyle = widget.dataTextStyle ??
+                                  eachCell.dataTextStyle;
 
                               return ResizableColumn(
                                 initialWidth: eachCell.width ?? 100,
-                                header: header,
+                                header: EachCell(
+                                  text: eachCell.text,
+                                  width: eachCell.width,
+                                  height: eachCell.height,
+                                  dataTextStyle: headerTextStyle,
+                                  dataBackgroundColor:
+                                      eachCell.dataBackgroundColor,
+                                ),
                                 isExpandable: eachCell.isExpandable,
                                 isFixed: true,
                                 draggableIcon: widget.draggableIcon,
@@ -368,9 +409,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                       child.copyWith(
                                         dataBackgroundColor:
                                             rowCell?.dataBackgroundColor,
-                                        headerBackgroundColor:
-                                            rowCell?.headerBackgroundColor,
-                                        dataTextStyle: rowCell?.dataTextStyle,
+                                        dataTextStyle: rowCell?.dataTextStyle ??
+                                            dataTextStyle,
                                         width: rowCell?.width ?? child.width,
                                         height: rowCell?.height ?? child.height,
                                       ),
@@ -397,10 +437,23 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                         .skip(widget.fixedCount)
                                         .map((header) {
                                       final eachCell = header;
+                                      final headerTextStyle =
+                                          widget.headerTextStyle ??
+                                              eachCell.headerTextStyle;
+                                      final dataTextStyle =
+                                          widget.dataTextStyle ??
+                                              eachCell.dataTextStyle;
 
                                       return ResizableColumn(
                                         initialWidth: eachCell.width ?? 100,
-                                        header: header,
+                                        header: EachCell(
+                                          text: eachCell.text,
+                                          width: eachCell.width,
+                                          height: eachCell.height,
+                                          dataTextStyle: headerTextStyle,
+                                          dataBackgroundColor:
+                                              eachCell.dataBackgroundColor,
+                                        ),
                                         isExpandable: eachCell.isExpandable,
                                         draggableIcon: widget.draggableIcon,
                                         maxWidth:
@@ -433,7 +486,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                                 dataBackgroundColor: rowCell
                                                     ?.dataBackgroundColor,
                                                 dataTextStyle:
-                                                    rowCell?.dataTextStyle,
+                                                    rowCell?.dataTextStyle ??
+                                                        dataTextStyle,
                                                 width: rowCell?.width ??
                                                     child.width,
                                                 height: rowCell?.height ??

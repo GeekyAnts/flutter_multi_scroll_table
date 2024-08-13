@@ -67,6 +67,9 @@ class EachCell extends StatelessWidget {
   /// Whether the cell is expandable. Default is false.
   final bool isExpandable;
 
+  /// The priority of the cell, determining its order among other cells. A lower value indicates higher priority.
+  /// If not provided, the cell will not be prioritized explicitly.
+
   final int? priority;
 
   @override
