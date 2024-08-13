@@ -10,11 +10,6 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
-  final List<int> _numbers = List.generate(20, (index) => index + 1)..shuffle();
-
-  final List<String> _randomAlphabets =
-      List.generate(20, (_) => CommonUtils.generateRandomAlphabet());
-
   final TextStyle? headerTextStyle =
       const TextStyle(fontWeight: FontWeight.bold);
 
@@ -42,7 +37,6 @@ class _DemoScreenState extends State<DemoScreen> {
         width: 100,
         headerTextStyle: headerTextStyle,
         isExpandable: true,
-        priority: 0,
         isHeader: true,
       ),
       EachCell(
@@ -86,8 +80,6 @@ class _DemoScreenState extends State<DemoScreen> {
         text: "Random 2",
         width: 100,
         headerTextStyle: headerTextStyle,
-        dataTextStyle:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         isHeader: true,
       ),
       EachCell(
@@ -107,8 +99,8 @@ class _DemoScreenState extends State<DemoScreen> {
     // ColumnChildren list
 
     final columnChildren = [
-      _numbers,
-      _randomAlphabets,
+      CommonUtils.numbers,
+      CommonUtils.randomAlphabets,
       CommonUtils.names,
       CommonUtils.cities,
       CommonUtils.fruits,
@@ -130,6 +122,17 @@ class _DemoScreenState extends State<DemoScreen> {
         headers: headers,
         columnChildren: columnChildren,
         fixedCount: 2,
+        onGenerateRowConfiguration: (rowIndex, rowChildren) {
+          if (rowIndex == 3) {
+            for (int i = 0; i < rowChildren.length; i++) {
+              rowChildren[i] = (rowChildren[i]).copyWith(
+                  dataBackgroundColor: Colors.amber,
+                  dataTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 43, 59, 71),
+                      fontWeight: FontWeight.bold));
+            }
+          }
+        },
       ),
     );
   }

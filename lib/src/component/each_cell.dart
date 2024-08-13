@@ -133,6 +133,7 @@ extension EachCellCopyWith on EachCell {
       headerBackgroundColor:
           headerBackgroundColor ?? this.headerBackgroundColor,
       dataBackgroundColor: dataBackgroundColor ?? this.dataBackgroundColor,
+      dataTextStyle: dataTextStyle ?? this.dataTextStyle,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
       border: border ?? this.border,

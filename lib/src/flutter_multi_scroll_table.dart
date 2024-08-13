@@ -11,7 +11,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
   final bool isAscending;
   final BoxBorder? tableBorder;
   final Widget? draggableIcon;
-  final void Function(int, List<dynamic>)? onGenerateRowConfiguration;
+  final void Function(int, List<EachCell>)? onGenerateRowConfiguration;
 
   const FlutterMultiScrollTable({
     super.key,
@@ -119,7 +119,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   void _applyRowConfigurations(List<List<EachCell>> columnChildren) {
     for (int rowIndex = 0; rowIndex < columnChildren[0].length; rowIndex++) {
       if (widget.onGenerateRowConfiguration != null) {
-        List<dynamic> rowChildren =
+        List<EachCell> rowChildren =
             columnChildren.map((col) => col[rowIndex]).toList();
 
         // Apply configurations
@@ -131,10 +131,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         // Extract and store row configurations
         _rowConfigurations[rowIndex] = {};
         for (int colIndex = 0; colIndex < rowChildren.length; colIndex++) {
-          if (rowChildren[colIndex] is EachCell) {
-            _rowConfigurations[rowIndex]![colIndex] =
-                rowChildren[colIndex] as EachCell;
-          }
+          _rowConfigurations[rowIndex]![colIndex] = rowChildren[colIndex];
         }
       }
     }
@@ -174,47 +171,75 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   }
 
   void _sortHeadersByPriority() {
-    for (var i = 0; i < widget.headers.length; i++) {
-      if (widget.headers[i].priority == null) {
-        widget.headers[i] = widget.headers[i].copyWith(
-          priority: i,
-        );
+    // Initialize lists to hold headers with set priorities and those without
+    List<MapEntry<EachCell, List<dynamic>>> prioritizedHeaders = [];
+    List<MapEntry<EachCell, List<dynamic>>> unprioritizedHeaders = [];
+
+    // Separate headers based on whether they have a set priority or not
+    for (int i = 0; i < widget.headers.length; i++) {
+      if (widget.headers[i].priority != null) {
+        prioritizedHeaders
+            .add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+      } else {
+        unprioritizedHeaders
+            .add(MapEntry(widget.headers[i], widget.columnChildren[i]));
       }
     }
 
-    for (var i = 0; i < widget.headers.length; i++) {
-      if (widget.headers[i].priority != null) {
-        if (widget.headers[i].priority! >= widget.headers.length) {
-          widget.headers[i] = widget.headers[i].copyWith(
-            priority: widget.headers.length,
-          );
-        } else if (widget.headers[i].priority! < 0) {
-          widget.headers[i] = widget.headers[i].copyWith(
-            priority: 0,
-          );
-        }
+    // Sort the prioritized headers based on their priority value
+    prioritizedHeaders
+        .sort((a, b) => a.key.priority!.compareTo(b.key.priority!));
+
+    // Create a list to hold the combined headers and columns with enough space
+    List<MapEntry<EachCell, List<dynamic>>> combined = List.filled(
+      widget.headers.length,
+      const MapEntry<EachCell, List<dynamic>>(
+          EachCell(
+            text: '',
+          ),
+          []),
+    );
+
+    // Add prioritized headers to the combined list
+    for (var entry in prioritizedHeaders) {
+      int priorityIndex = entry.key.priority!;
+      // Ensure we don't exceed the bounds of the combined list
+      if (priorityIndex < combined.length) {
+        combined[priorityIndex] = entry;
       }
     }
-    // Combine headers with their columns
-    List<MapEntry<EachCell, List<dynamic>>> combined = [];
-    for (int i = 0; i < widget.headers.length; i++) {
-      combined.add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+
+    // Fill in the gaps with unprioritized headers in their natural order
+    int currentIndex = 0;
+    for (var entry in unprioritizedHeaders) {
+      // Skip over any indices that have already been filled
+      while (currentIndex < combined.length &&
+          combined[currentIndex].key.text.isNotEmpty) {
+        currentIndex++;
+      }
+      // Add unprioritized entries to the next available spot
+      if (currentIndex < combined.length) {
+        combined[currentIndex] = entry;
+      } else {
+        combined.add(entry);
+      }
+      currentIndex++;
     }
-    // Sort based on priority
-    combined.sort((a, b) {
-      int priorityA = a.key.priority ?? widget.headers.indexOf(a.key);
-      int priorityB = b.key.priority ?? widget.headers.indexOf(b.key);
-      return priorityA.compareTo(priorityB);
-    });
-    // Update headers and columnChildren after sorting
+
+    //  Clear the original headers and columnChildren lists
     widget.headers.clear();
     widget.columnChildren.clear();
 
+    // Add the combined entries back to the headers and columnChildren lists
     for (var entry in combined) {
-      widget.headers.add(entry.key);
-      widget.columnChildren.add(entry.value);
+      if (entry.key.text.isNotEmpty) {
+        // Ensure we are not adding placeholder entries
+        widget.headers.add(entry.key);
+        widget.columnChildren.add(entry.value);
+      }
     }
 
+    //  Update the state to reflect the sorted order
     setState(() {});
   }
 
@@ -273,7 +298,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         rowIndex < styledColumnChildren[0].length;
         rowIndex++) {
       if (widget.onGenerateRowConfiguration != null) {
-        List<dynamic> rowChildren =
+        List<EachCell> rowChildren =
             styledColumnChildren.map((col) => col[rowIndex]).toList();
 
         widget.onGenerateRowConfiguration!(
@@ -282,14 +307,6 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         );
       }
     }
-
-    _rowConfigurations.forEach((rowIndex, columnMap) {
-      print('Row $rowIndex:');
-      columnMap.forEach((colIndex, eachCell) {
-        //  print('  Column $colIndex: ${eachCell.dataBackgroundColor}');
-        print('  Column text $colIndex: ${eachCell.dataTextStyle}');
-      });
-    });
 
     return SingleChildScrollView(
       child: SafeArea(

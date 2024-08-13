@@ -1,6 +1,11 @@
 import 'dart:math';
 
 class CommonUtils {
+  static final List<int> numbers = List.generate(20, (index) => index + 1)
+    ..shuffle();
+
+  static final List<String> randomAlphabets =
+      List.generate(20, (_) => CommonUtils.generateRandomAlphabet());
   static String generateRandomAlphabet() {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     final randomIndex = Random().nextInt(alphabet.length);
