@@ -10,6 +10,8 @@ class ResizableColumn extends StatefulWidget {
   final Widget? draggableIcon;
   final double maxWidth;
   final double availableWidth;
+  final double? tableDividerThickness;
+  final Color? tableDividerColor;
   final Function(double) onWidthChanged;
 
   const ResizableColumn({
@@ -23,6 +25,8 @@ class ResizableColumn extends StatefulWidget {
     required this.maxWidth,
     required this.availableWidth,
     required this.onWidthChanged,
+    this.tableDividerThickness,
+    this.tableDividerColor,
   }) : super(key: key);
 
   @override
@@ -99,8 +103,10 @@ class _ResizableColumnState extends State<ResizableColumn> {
                   ],
                 ),
               ),
-              const Divider(
+              Divider(
                 height: 1,
+                thickness: widget.tableDividerThickness,
+                color: widget.tableDividerColor,
               ),
             ],
           ),

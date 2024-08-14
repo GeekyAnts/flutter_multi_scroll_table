@@ -38,13 +38,12 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
-  final List<int> _numbers = List.generate(20, (index) => index + 1)..shuffle();
-
-  final List<String> _randomAlphabets =
-      List.generate(20, (_) => CommonUtils.generateRandomAlphabet());
-
   final TextStyle? headerTextStyle =
       const TextStyle(fontWeight: FontWeight.bold);
+
+  final TextStyle? dataTextStyle = const TextStyle(
+    fontWeight: FontWeight.w200,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -53,177 +52,95 @@ class _DemoScreenState extends State<DemoScreen> {
       EachCell(
         text: "Sr. No",
         width: 60,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random",
         width: 90,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
         isExpandable: true,
       ),
       EachCell(
         text: "Members",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isExpandable: true,
         isHeader: true,
       ),
       EachCell(
         text: "Cities",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Fruits",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Cars",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Countries",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
         isExpandable: true,
       ),
       EachCell(
         text: "Codes",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 1",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 2",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 3",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
       EachCell(
         text: "Random 4",
         width: 100,
-        textStyle: headerTextStyle,
+        headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
     ];
 
-    // Column Children list
+    // ColumnChildren list
 
     final columnChildren = [
-      _numbers.map((number) {
-        return EachCell(
-          text: number.toString(),
-          width: 80,
-          height: 45,
-        );
-      }).toList(),
-      _randomAlphabets.map((number) {
-        return EachCell(
-          text: number.toString(),
-          width: 90,
-          height: 45,
-        );
-      }).toList(),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.names[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.cities[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.fruits[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.carBrands[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countries[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
-      List.generate(
-        20,
-        (index) => EachCell(
-          text: CommonUtils.countryCodes[index],
-          width: 100,
-          height: 45,
-        ),
-      ),
+      CommonUtils.numbers,
+      CommonUtils.randomAlphabets,
+      CommonUtils.names,
+      CommonUtils.cities,
+      CommonUtils.fruits,
+      CommonUtils.carBrands,
+      CommonUtils.countries,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes,
+      CommonUtils.countryCodes
     ];
 
     return Scaffold(
@@ -234,7 +151,18 @@ class _DemoScreenState extends State<DemoScreen> {
         height: 480,
         headers: headers,
         columnChildren: columnChildren,
-        fixedCount: 3,
+        fixedCount: 2,
+        onGenerateRowConfiguration: (rowIndex, rowChildren) {
+          if (rowIndex == 3) {
+            for (int i = 0; i < rowChildren.length; i++) {
+              rowChildren[i] = (rowChildren[i]).copyWith(
+                  dataBackgroundColor: Colors.blueAccent,
+                  dataTextStyle: const TextStyle(
+                    color: Colors.white,
+                  ));
+            }
+          }
+        },
       ),
     );
   }
@@ -245,17 +173,39 @@ class _DemoScreenState extends State<DemoScreen> {
 
 ## Parameters
 
-| Parameters       | Description                                                                       |
-| ---------------- | --------------------------------------------------------------------------------- |
-| `headers`        | **Required**. The header widgets for all columns, both fixed and scrollable.      |
-| `columnChildren` | **Required**. The children widgets for all columns, both fixed and scrollable.    |
-| `fixedCount`     | **Required**. The number of columns that are fixed (not scrollable horizontally). |
-| `totalWidth`     | **Required**. The total width of the table.                                       |
-| `height`         | Optional. The total height of the table. Default is 500.                          |
-| `isAscending`    | Optional. Whether the sorting is in ascending order. Default is true.             |
-| `tableBorder`    | Optional. The border for the table.                                               |
-| `draggableIcon`  | Optional. The icon displayed for dragging the column width.                       |
-|                  |
+| Parameters                   | Description                                                                                                                                          |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `headers`                    | **Required**. A list of `EachCell` widgets representing the headers for all columns, both fixed and scrollable.                                      |
+| `columnChildren`             | **Required**. A list of lists containing the children for all columns, both fixed and scrollable. Each inner list corresponds to a column.           |
+| `fixedCount`                 | **Required**. The number of columns that are fixed (not scrollable horizontally).                                                                    |
+| `totalWidth`                 | **Required**. The total width of the table.                                                                                                          |
+| `height`                     | Optional. The total height of the table. Default is 500.                                                                                             |
+| `isAscending`                | Optional. Whether the sorting is in ascending order. Default is true.                                                                                |
+| `tableBorder`                | Optional. The border for the table, provided as a `BoxBorder`.                                                                                       |
+| `draggableIcon`              | Optional. The icon displayed for dragging to adjust the column width.                                                                                |
+| `headerTextStyle`            | Optional. The text style applied to the header cells.                                                                                                |
+| `dataTextStyle`              | Optional. The text style applied to the data cells.                                                                                                  |
+| `onGenerateRowConfiguration` | Optional. A callback function that takes the row index and a list of `EachCell` for that row. Used to customize row-specific properties dynamically. |
+
+## EachCell Parameters
+
+| Parameters              | Description                                                                                                                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`                  | **Required**. The text content of the cell.                                                                                                                                         |
+| `isHeader`              | Optional. Whether the cell is a header cell. Default is `false`.                                                                                                                    |
+| `isLeftAlign`           | Optional. Whether the text should be left-aligned. Default is `false`.                                                                                                              |
+| `width`                 | Optional. The width of the cell.                                                                                                                                                    |
+| `height`                | Optional. The height of the cell. Default height is 40.                                                                                                                             |
+| `headerTextStyle`       | Optional. The text style applied to the header cell content.                                                                                                                        |
+| `dataTextStyle`         | Optional. The text style applied to the data cell content.                                                                                                                          |
+| `headerBackgroundColor` | Optional. The background color of the header cell.                                                                                                                                  |
+| `dataBackgroundColor`   | Optional. The background color of the data cell.                                                                                                                                    |
+| `padding`               | Optional. The padding inside the cell.                                                                                                                                              |
+| `margin`                | Optional. The margin outside the cell.                                                                                                                                              |
+| `border`                | Optional. The border of the cell.                                                                                                                                                   |
+| `borderRadius`          | Optional. The border radius of the cell.                                                                                                                                            |
+| `isExpandable`          | Optional. Whether the cell is expandable. Default is `false`.                                                                                                                       |
+| `priority`              | Optional. The priority of the cell, determining its order among other cells. A lower value indicates higher priority. If not provided, the cell will not be prioritized explicitly. |
 
 ## Additional information
 

@@ -32,6 +32,10 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// The border for the entire table. Defaults to a grey border if not provided.
   final BoxBorder? tableBorder;
 
+  final double? tableDividerThickness;
+
+  final Color? tableDividerColor;
+
   /// A custom widget to use as the draggable icon for resizing columns.
   final Widget? draggableIcon;
 
@@ -54,6 +58,8 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.onGenerateRowConfiguration,
     this.headerTextStyle,
     this.dataTextStyle,
+    this.tableDividerThickness,
+    this.tableDividerColor,
   });
 
   @override
@@ -75,6 +81,11 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   @override
   void initState() {
+    if (widget.columnChildren.length < widget.headers.length) {
+      throw FlutterError(
+          'The number of columns children provided (${widget.columnChildren.length}) is lesser than the number of headers (${widget.headers.length}). '
+          'Please provide a column child for each header.');
+    }
     _horizontalScrollController = ScrollController();
     _headerScrollController = ScrollController();
     _verticalScrollController = ScrollController();
@@ -387,6 +398,9 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 maxWidth: MediaQuery.of(context).size.width,
                                 availableWidth: _remainingWidth,
                                 onWidthChanged: _onWidthChanged,
+                                tableDividerThickness:
+                                    widget.tableDividerThickness,
+                                tableDividerColor: widget.tableDividerColor,
                                 children: styledColumnChildren[
                                         widget.headers.indexOf(header)]
                                     .map((child) {
@@ -414,7 +428,11 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                         width: rowCell?.width ?? child.width,
                                         height: rowCell?.height ?? child.height,
                                       ),
-                                      const Divider(height: 1),
+                                      Divider(
+                                        height: 1,
+                                        thickness: widget.tableDividerThickness,
+                                        color: widget.tableDividerColor,
+                                      ),
                                     ],
                                   );
                                 }).toList(),
@@ -459,6 +477,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                         maxWidth:
                                             MediaQuery.of(context).size.width,
                                         availableWidth: _remainingWidth,
+                                        tableDividerThickness:
+                                            widget.tableDividerThickness,
+                                        tableDividerColor:
+                                            widget.tableDividerColor,
                                         onWidthChanged: _onWidthChanged,
                                         children: styledColumnChildren[
                                                 widget.headers.indexOf(header)]
@@ -493,7 +515,12 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                                 height: rowCell?.height ??
                                                     child.height,
                                               ),
-                                              const Divider(height: 1),
+                                              Divider(
+                                                height: 1,
+                                                thickness: widget
+                                                    .tableDividerThickness,
+                                                color: widget.tableDividerColor,
+                                              ),
                                             ],
                                           );
                                         }).toList(),

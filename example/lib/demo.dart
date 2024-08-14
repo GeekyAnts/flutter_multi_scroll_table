@@ -125,10 +125,10 @@ class _DemoScreenState extends State<DemoScreen> {
         columnChildren: columnChildren,
         fixedCount: 2,
         onGenerateRowConfiguration: (rowIndex, rowChildren) {
-          if (rowIndex == 3) {
+          if (rowIndex == 3 || rowIndex == 5) {
             for (int i = 0; i < rowChildren.length; i++) {
               rowChildren[i] = (rowChildren[i]).copyWith(
-                  dataBackgroundColor: Colors.blueAccent,
+                  dataBackgroundColor: Colors.red,
                   dataTextStyle: const TextStyle(
                     color: Colors.white,
                   ));
