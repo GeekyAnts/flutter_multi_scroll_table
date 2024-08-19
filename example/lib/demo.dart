@@ -19,7 +19,7 @@ class _DemoScreenState extends State<DemoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Column Headers list
+    // // Column Headers list
     final headers = [
       EachCell(
         text: "Sr. No",
@@ -90,29 +90,6 @@ class _DemoScreenState extends State<DemoScreen> {
         headerTextStyle: headerTextStyle,
         isHeader: true,
       ),
-      EachCell(
-        text: "Random 4",
-        width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
-      ),
-    ];
-
-    // ColumnChildren list
-
-    final columnChildren = [
-      CommonUtils.numbers,
-      CommonUtils.randomAlphabets,
-      CommonUtils.names,
-      CommonUtils.cities,
-      CommonUtils.fruits,
-      CommonUtils.carBrands,
-      CommonUtils.countries,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes
     ];
 
     return Scaffold(
@@ -122,7 +99,8 @@ class _DemoScreenState extends State<DemoScreen> {
         totalWidth: 900,
         height: 480,
         headers: headers,
-        columnChildren: columnChildren,
+        //dataList: CommonUtils.dataList,
+        jsonDataList: CommonUtils.jsonDataList,
         fixedCount: 2,
         onGenerateRowConfiguration: (rowIndex, rowChildren) {
           if (rowIndex == 3 || rowIndex == 5) {

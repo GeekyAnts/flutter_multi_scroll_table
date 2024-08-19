@@ -7,9 +7,15 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// A list of header cells for the table. Each header is an `EachCell` widget.
   final List<EachCell> headers;
 
-  /// A 2D list representing the data for each column. The outer list represents columns,
-  /// and each inner list represents the data for each cell in that column.
-  final List<List<dynamic>> columnChildren;
+  /// A list of maps where each map represents a row of data in JSON format.
+  /// Each key in the map corresponds to a column header, and the value is the cell data.
+  /// This is used to generate column data and headers if not explicitly provided.
+  final List<Map<String, dynamic>>? jsonDataList;
+
+  /// A 2D list where each inner list represents a row of data.
+  /// Each element in the inner list represents a cell value in that row.
+  /// This format is used to provide column data directly, assuming the column headers are already known.
+  final List<List<dynamic>>? dataList;
 
   /// The number of columns that should remain fixed when horizontally scrolling.
   final int fixedCount;
@@ -48,7 +54,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
   const FlutterMultiScrollTable({
     super.key,
     required this.headers,
-    required this.columnChildren,
+    this.dataList,
     required this.fixedCount,
     required this.totalWidth,
     this.height = 500,
@@ -60,6 +66,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.dataTextStyle,
     this.tableDividerThickness,
     this.tableDividerColor,
+    this.jsonDataList,
   });
 
   @override
@@ -79,13 +86,18 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   // Store styles for EachCell
   final Map<int, Map<int, EachCell>> _rowConfigurations = {};
 
+  late List<List<dynamic>> columnChildren;
+
   @override
   void initState() {
-    if (widget.columnChildren.length < widget.headers.length) {
+    _initializeColumnChildren();
+    // Validate headers and column data
+    if (columnChildren.length < widget.headers.length) {
       throw FlutterError(
-          'The number of columns children provided (${widget.columnChildren.length}) is lesser than the number of headers (${widget.headers.length}). '
+          'The number of column children provided (${columnChildren.length}) is less than the number of headers (${widget.headers.length}). '
           'Please provide a column child for each header.');
     }
+
     _horizontalScrollController = ScrollController();
     _headerScrollController = ScrollController();
     _verticalScrollController = ScrollController();
@@ -95,6 +107,24 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     _sortHeadersByPriority();
 
     super.initState();
+  }
+
+  void _initializeColumnChildren() {
+    // Check if both jsonDataList and dataList are provided
+    if (widget.jsonDataList != null && widget.dataList != null) {
+      throw FlutterError(
+          'Both jsonDataList and dataList cannot be provided simultaneously. Please provide only one dataList.');
+    }
+
+    // Convert input data to column-wise format
+    if (widget.jsonDataList != null) {
+      columnChildren = _convertToColumnWiseFromJson(widget.jsonDataList!);
+    } else if (widget.dataList != null) {
+      columnChildren = _convertToColumnWiseFromData(widget.dataList!);
+    } else {
+      throw FlutterError(
+          'No data provided. Please provide either jsonDataList or dataList.');
+    }
   }
 
   @override
@@ -178,6 +208,47 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     }
   }
 
+  List<List<dynamic>> _convertToColumnWiseFromJson(
+      List<Map<String, dynamic>> jsonDataList) {
+    if (jsonDataList.isEmpty) return [];
+
+    final List<String> headers = jsonDataList.first.keys.toList();
+    final List<List<dynamic>> columnWiseData =
+        List.generate(headers.length, (_) => []);
+
+    for (final map in jsonDataList) {
+      for (int i = 0; i < headers.length; i++) {
+        columnWiseData[i].add(map[headers[i]]);
+      }
+    }
+
+    return columnWiseData;
+  }
+
+  List<List<dynamic>> _convertToColumnWiseFromData(
+      List<List<dynamic>> dataList) {
+    if (dataList.isEmpty) return [];
+
+    // Verify all rows have the same number of columns
+    final int numRows = dataList.length;
+    final int numCols = dataList.first.length;
+
+    // Create a list of empty lists for each column
+    final List<List<dynamic>> columnWiseData =
+        List.generate(numCols, (_) => []);
+
+    for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
+      if (dataList[rowIndex].length != numCols) {
+        continue; // Skip rows with length mismatch
+      }
+      for (int colIndex = 0; colIndex < numCols; colIndex++) {
+        columnWiseData[colIndex].add(dataList[rowIndex][colIndex]);
+      }
+    }
+
+    return columnWiseData;
+  }
+
   List<List<EachCell>> _generateColumnChildrenWithStyles() {
     List<List<EachCell>> styledColumnChildren = [];
 
@@ -188,9 +259,9 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
       double? width = widget.headers[i].width;
       double? height = widget.headers[i].height;
 
-      if (i < widget.columnChildren.length) {
-        for (int j = 0; j < widget.columnChildren[i].length; j++) {
-          dynamic data = widget.columnChildren[i][j];
+      if (i < columnChildren.length) {
+        for (int j = 0; j < columnChildren[i].length; j++) {
+          dynamic data = columnChildren[i][j];
           String text = data.toString();
           EachCell cell = EachCell(
             text: text,
@@ -219,11 +290,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     // Separate headers based on whether they have a set priority or not
     for (int i = 0; i < widget.headers.length; i++) {
       if (widget.headers[i].priority != null) {
-        prioritizedHeaders
-            .add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+        prioritizedHeaders.add(MapEntry(widget.headers[i], columnChildren[i]));
       } else {
         unprioritizedHeaders
-            .add(MapEntry(widget.headers[i], widget.columnChildren[i]));
+            .add(MapEntry(widget.headers[i], columnChildren[i]));
       }
     }
 
@@ -269,14 +339,14 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     //  Clear the original headers and columnChildren lists
     widget.headers.clear();
-    widget.columnChildren.clear();
+    columnChildren.clear();
 
     // Add the combined entries back to the headers and columnChildren lists
     for (var entry in combined) {
       if (entry.key.text.isNotEmpty) {
         // Ensure we are not adding placeholder entries
         widget.headers.add(entry.key);
-        widget.columnChildren.add(entry.value);
+        columnChildren.add(entry.value);
       }
     }
 
@@ -287,7 +357,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   void _sortColumn() {
     setState(() {
       for (int i = 0; i < widget.fixedCount; i++) {
-        widget.columnChildren[i].sort((a, b) {
+        columnChildren[i].sort((a, b) {
           final textA = Utils.getTextFromWidget(
               a is EachCell ? a : EachCell(text: a.toString()));
           final textB = Utils.getTextFromWidget(
@@ -297,8 +367,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         });
       }
 
-      for (int i = widget.fixedCount; i < widget.columnChildren.length; i++) {
-        widget.columnChildren[i].sort((a, b) {
+      for (int i = widget.fixedCount; i < columnChildren.length; i++) {
+        columnChildren[i].sort((a, b) {
           final textA = Utils.getTextFromWidget(
               a is EachCell ? a : EachCell(text: a.toString()));
           final textB = Utils.getTextFromWidget(
