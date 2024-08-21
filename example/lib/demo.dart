@@ -10,8 +10,9 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
-  final TextStyle? headerTextStyle =
-      const TextStyle(fontWeight: FontWeight.bold);
+  final TextStyle? headerTextStyle = const TextStyle(
+    fontWeight: FontWeight.bold,
+  );
 
   final TextStyle? dataTextStyle = const TextStyle(
     fontWeight: FontWeight.w200,
@@ -21,74 +22,52 @@ class _DemoScreenState extends State<DemoScreen> {
   Widget build(BuildContext context) {
     // // Column Headers list
     final headers = [
-      EachCell(
+      const EachCell(
         text: "Sr. No",
         width: 60,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random",
         width: 90,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
         isExpandable: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Members",
         width: 100,
-        headerTextStyle: headerTextStyle,
         isExpandable: true,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Cities",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Fruits",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Cars",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Countries",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
         isExpandable: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Codes",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random 1",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random 2",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random 3",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
     ];
 
@@ -99,14 +78,15 @@ class _DemoScreenState extends State<DemoScreen> {
         totalWidth: 900,
         height: 480,
         headers: headers,
-        //dataList: CommonUtils.dataList,
-        jsonDataList: CommonUtils.jsonDataList,
+        headerTextStyle: headerTextStyle,
+        dataList: CommonUtils.dataList,
+        // jsonDataList: CommonUtils.jsonDataList,
         fixedCount: 2,
         onGenerateRowConfiguration: (rowIndex, rowChildren) {
-          if (rowIndex == 3 || rowIndex == 5) {
+          if (rowIndex == 3) {
             for (int i = 0; i < rowChildren.length; i++) {
               rowChildren[i] = (rowChildren[i]).copyWith(
-                  dataBackgroundColor: Colors.red,
+                  dataBackgroundColor: Colors.blue,
                   dataTextStyle: const TextStyle(
                     color: Colors.white,
                   ));

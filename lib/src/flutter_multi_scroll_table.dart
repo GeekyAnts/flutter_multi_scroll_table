@@ -5,7 +5,7 @@ import '../flutter_multi_scroll_table.dart';
 /// A widget that represents a multi-scrollable table with resizable columns.
 class FlutterMultiScrollTable extends StatefulWidget {
   /// A list of header cells for the table. Each header is an `EachCell` widget.
-  final List<EachCell> headers;
+  final List<EachCell>? headers;
 
   /// A list of maps where each map represents a row of data in JSON format.
   /// Each key in the map corresponds to a column header, and the value is the cell data.
@@ -38,8 +38,12 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// The border for the entire table. Defaults to a grey border if not provided.
   final BoxBorder? tableBorder;
 
+  /// The thickness of the divider lines between table cells.
+  /// If not provided, a default thickness will be used.
   final double? tableDividerThickness;
 
+  /// The color of the divider lines between table cells.
+  /// If not provided, a default color will be used.
   final Color? tableDividerColor;
 
   /// A custom widget to use as the draggable icon for resizing columns.
@@ -53,7 +57,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// Creates a [FlutterMultiScrollTable] widget.
   const FlutterMultiScrollTable({
     super.key,
-    required this.headers,
+    this.headers,
     this.dataList,
     required this.fixedCount,
     required this.totalWidth,
@@ -88,13 +92,24 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   late List<List<dynamic>> columnChildren;
 
+  late List<EachCell>? jsonHeaders;
+
   @override
   void initState() {
     _initializeColumnChildren();
-    // Validate headers and column data
-    if (columnChildren.length < widget.headers.length) {
+
+    // Use jsonHeaders if headers are not provided by the user
+    final effectiveHeaders = widget.headers ?? jsonHeaders;
+
+    if (effectiveHeaders == null) {
       throw FlutterError(
-          'The number of column children provided (${columnChildren.length}) is less than the number of headers (${widget.headers.length}). '
+          'No headers provided. Either provide headers or jsonDataList to generate headers automatically.');
+    }
+
+    // Validate headers and column data
+    if (columnChildren.length < effectiveHeaders.length) {
+      throw FlutterError(
+          'The number of column children provided (${columnChildren.length}) is less than the number of headers (${effectiveHeaders.length}). '
           'Please provide a column child for each header.');
     }
 
@@ -119,7 +134,13 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     // Convert input data to column-wise format
     if (widget.jsonDataList != null) {
       columnChildren = _convertToColumnWiseFromJson(widget.jsonDataList!);
+
+      jsonHeaders = _generateHeadersFromJson(widget.jsonDataList!);
     } else if (widget.dataList != null) {
+      if (widget.headers == null || widget.headers!.isEmpty) {
+        throw FlutterError(
+            'Headers are required when using dataList. Please provide headers.');
+      }
       columnChildren = _convertToColumnWiseFromData(widget.dataList!);
     } else {
       throw FlutterError(
@@ -159,11 +180,28 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     _isHorizontalScrolling = false;
   }
 
+  List<EachCell> _generateHeadersFromJson(
+      List<Map<String, dynamic>> jsonDataList) {
+    if (jsonDataList.isEmpty) {
+      return [];
+    }
+
+    final headers = jsonDataList.first.keys.toList();
+    return headers.map((header) => EachCell(text: header)).toList();
+  }
+
   double getTotalFixedWidth() {
     double totalWidth = 0;
-    for (var header in widget.headers.take(widget.fixedCount)) {
-      totalWidth += header.width ?? 100;
+
+    // Use widget.headers if available, otherwise fallback to jsonHeaders
+    final effectiveHeaders = widget.headers ?? jsonHeaders;
+
+    if (effectiveHeaders != null) {
+      for (var header in effectiveHeaders.take(widget.fixedCount)) {
+        totalWidth += header.width ?? 100;
+      }
     }
+
     return totalWidth;
   }
 
@@ -218,7 +256,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     for (final map in jsonDataList) {
       for (int i = 0; i < headers.length; i++) {
-        columnWiseData[i].add(map[headers[i]]);
+        final value = map[headers[i]] ?? '--';
+        columnWiseData[i].add(value);
       }
     }
 
@@ -229,20 +268,19 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
       List<List<dynamic>> dataList) {
     if (dataList.isEmpty) return [];
 
-    // Verify all rows have the same number of columns
-    final int numRows = dataList.length;
-    final int numCols = dataList.first.length;
+    // Determine the maximum number of columns across all rows
+    final int numCols =
+        dataList.map((row) => row.length).reduce((a, b) => a > b ? a : b);
 
     // Create a list of empty lists for each column
     final List<List<dynamic>> columnWiseData =
         List.generate(numCols, (_) => []);
 
-    for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
-      if (dataList[rowIndex].length != numCols) {
-        continue; // Skip rows with length mismatch
-      }
+    for (final row in dataList) {
       for (int colIndex = 0; colIndex < numCols; colIndex++) {
-        columnWiseData[colIndex].add(dataList[rowIndex][colIndex]);
+        // Add data or "NA" if the column data is missing
+        columnWiseData[colIndex]
+            .add(colIndex < row.length ? row[colIndex] : "--");
       }
     }
 
@@ -252,48 +290,67 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   List<List<EachCell>> _generateColumnChildrenWithStyles() {
     List<List<EachCell>> styledColumnChildren = [];
 
-    for (int i = 0; i < widget.headers.length; i++) {
-      List<EachCell> column = [];
-      TextStyle? textStyle = widget.dataTextStyle;
-      Color? backgroundColor = widget.headers[i].dataBackgroundColor;
-      double? width = widget.headers[i].width;
-      double? height = widget.headers[i].height;
+    // Use widget.headers if available, otherwise fallback to jsonHeaders
+    final effectiveHeaders = widget.headers ?? jsonHeaders;
 
-      if (i < columnChildren.length) {
-        for (int j = 0; j < columnChildren[i].length; j++) {
-          dynamic data = columnChildren[i][j];
-          String text = data.toString();
-          EachCell cell = EachCell(
-            text: text,
-            width: width,
-            height: height,
-            dataTextStyle: textStyle,
-            dataBackgroundColor: backgroundColor,
-          );
-          column.add(cell);
+    if (effectiveHeaders != null) {
+      for (int i = 0; i < effectiveHeaders.length; i++) {
+        List<EachCell> column = [];
+        TextStyle? dataTextStyle = widget.dataTextStyle;
+
+        Color? headerBackgroundColor =
+            effectiveHeaders[i].headerBackgroundColor;
+        Color? dataBackgroundColor = effectiveHeaders[i].dataBackgroundColor;
+        double? width = effectiveHeaders[i].width;
+        double? height = effectiveHeaders[i].height;
+
+        if (i < columnChildren.length) {
+          for (int j = 0; j < columnChildren[i].length; j++) {
+            dynamic data = columnChildren[i][j];
+            String text = data.toString();
+
+            // Use headerTextStyle for the header row
+            EachCell cell = EachCell(
+              text: text,
+              width: width,
+              height: height,
+              dataTextStyle: dataTextStyle,
+              dataBackgroundColor: dataBackgroundColor,
+              headerBackgroundColor: j == 0 ? headerBackgroundColor : null,
+            );
+            column.add(cell);
+          }
         }
+        styledColumnChildren.add(column);
       }
-      styledColumnChildren.add(column);
-    }
 
-    // Apply row configurations here
-    _applyRowConfigurations(styledColumnChildren);
+      // Apply row configurations here
+      _applyRowConfigurations(styledColumnChildren);
+    }
 
     return styledColumnChildren;
   }
 
   void _sortHeadersByPriority() {
+    // Use widget.headers if available, otherwise fallback to jsonHeaders
+    final effectiveHeaders = widget.headers ?? jsonHeaders;
+
+    if (effectiveHeaders == null) {
+      return; // Return early if no headers are available
+    }
+
     // Initialize lists to hold headers with set priorities and those without
     List<MapEntry<EachCell, List<dynamic>>> prioritizedHeaders = [];
     List<MapEntry<EachCell, List<dynamic>>> unprioritizedHeaders = [];
 
     // Separate headers based on whether they have a set priority or not
-    for (int i = 0; i < widget.headers.length; i++) {
-      if (widget.headers[i].priority != null) {
-        prioritizedHeaders.add(MapEntry(widget.headers[i], columnChildren[i]));
+    for (int i = 0; i < effectiveHeaders.length; i++) {
+      if (effectiveHeaders[i].priority != null) {
+        prioritizedHeaders
+            .add(MapEntry(effectiveHeaders[i], columnChildren[i]));
       } else {
         unprioritizedHeaders
-            .add(MapEntry(widget.headers[i], columnChildren[i]));
+            .add(MapEntry(effectiveHeaders[i], columnChildren[i]));
       }
     }
 
@@ -303,12 +360,11 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     // Create a list to hold the combined headers and columns with enough space
     List<MapEntry<EachCell, List<dynamic>>> combined = List.filled(
-      widget.headers.length,
+      effectiveHeaders.length,
       const MapEntry<EachCell, List<dynamic>>(
-          EachCell(
-            text: '',
-          ),
-          []),
+        EachCell(text: ''),
+        [],
+      ),
     );
 
     // Add prioritized headers to the combined list
@@ -337,21 +393,23 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
       currentIndex++;
     }
 
-    //  Clear the original headers and columnChildren lists
-    widget.headers.clear();
+    // Clear the original headers and columnChildren lists
+    effectiveHeaders.clear();
     columnChildren.clear();
 
     // Add the combined entries back to the headers and columnChildren lists
     for (var entry in combined) {
       if (entry.key.text.isNotEmpty) {
         // Ensure we are not adding placeholder entries
-        widget.headers.add(entry.key);
+        effectiveHeaders.add(entry.key);
         columnChildren.add(entry.value);
       }
     }
 
-    //  Update the state to reflect the sorted order
-    setState(() {});
+    // Update the state to reflect the sorted order if using widget.headers
+    if (widget.headers != null) {
+      setState(() {});
+    }
   }
 
   void _sortColumn() {
@@ -443,7 +501,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                         GestureDetector(
                           onTap: _sortColumn,
                           child: Row(
-                            children: widget.headers
+                            children: (widget.headers ?? jsonHeaders)!
                                 .take(widget.fixedCount)
                                 .map((header) {
                               final eachCell = header;
@@ -458,9 +516,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                   text: eachCell.text,
                                   width: eachCell.width,
                                   height: eachCell.height,
-                                  dataTextStyle: headerTextStyle,
-                                  dataBackgroundColor:
-                                      eachCell.dataBackgroundColor,
+                                  headerTextStyle: headerTextStyle,
+                                  isHeader: true,
+                                  headerBackgroundColor:
+                                      eachCell.headerBackgroundColor,
                                 ),
                                 isExpandable: eachCell.isExpandable,
                                 isFixed: true,
@@ -472,7 +531,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                     widget.tableDividerThickness,
                                 tableDividerColor: widget.tableDividerColor,
                                 children: styledColumnChildren[
-                                        widget.headers.indexOf(header)]
+                                        (widget.headers ?? jsonHeaders)!
+                                            .indexOf(header)]
                                     .map((child) {
                                   // Get the row index and column index for the child
                                   final columnIndex = styledColumnChildren
@@ -521,7 +581,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                   scrollDirection: Axis.horizontal,
                                   controller: _horizontalScrollController,
                                   child: Row(
-                                    children: widget.headers
+                                    children: (widget.headers ?? jsonHeaders)!
                                         .skip(widget.fixedCount)
                                         .map((header) {
                                       final eachCell = header;
@@ -538,9 +598,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                           text: eachCell.text,
                                           width: eachCell.width,
                                           height: eachCell.height,
-                                          dataTextStyle: headerTextStyle,
-                                          dataBackgroundColor:
-                                              eachCell.dataBackgroundColor,
+                                          isHeader: true,
+                                          headerTextStyle: headerTextStyle,
+                                          headerBackgroundColor:
+                                              eachCell.headerBackgroundColor,
                                         ),
                                         isExpandable: eachCell.isExpandable,
                                         draggableIcon: widget.draggableIcon,
@@ -553,7 +614,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                             widget.tableDividerColor,
                                         onWidthChanged: _onWidthChanged,
                                         children: styledColumnChildren[
-                                                widget.headers.indexOf(header)]
+                                                (widget.headers ?? jsonHeaders)!
+                                                    .indexOf(header)]
                                             .map((child) {
                                           // Get the row index and column index for the child
                                           final columnIndex =

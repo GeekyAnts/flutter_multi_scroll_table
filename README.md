@@ -38,8 +38,9 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
-  final TextStyle? headerTextStyle =
-      const TextStyle(fontWeight: FontWeight.bold);
+  final TextStyle? headerTextStyle = const TextStyle(
+    fontWeight: FontWeight.bold,
+  );
 
   final TextStyle? dataTextStyle = const TextStyle(
     fontWeight: FontWeight.w200,
@@ -47,100 +48,55 @@ class _DemoScreenState extends State<DemoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Column Headers list
+    // // Column Headers list
     final headers = [
-      EachCell(
+      const EachCell(
         text: "Sr. No",
         width: 60,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random",
         width: 90,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
         isExpandable: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Members",
         width: 100,
-        headerTextStyle: headerTextStyle,
         isExpandable: true,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Cities",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Fruits",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Cars",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Countries",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
         isExpandable: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Codes",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random 1",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random 2",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
+      const EachCell(
         text: "Random 3",
         width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
       ),
-      EachCell(
-        text: "Random 4",
-        width: 100,
-        headerTextStyle: headerTextStyle,
-        isHeader: true,
-      ),
-    ];
-
-    // ColumnChildren list
-
-    final columnChildren = [
-      CommonUtils.numbers,
-      CommonUtils.randomAlphabets,
-      CommonUtils.names,
-      CommonUtils.cities,
-      CommonUtils.fruits,
-      CommonUtils.carBrands,
-      CommonUtils.countries,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes,
-      CommonUtils.countryCodes
     ];
 
     return Scaffold(
@@ -150,13 +106,15 @@ class _DemoScreenState extends State<DemoScreen> {
         totalWidth: 900,
         height: 480,
         headers: headers,
-        columnChildren: columnChildren,
+        headerTextStyle: headerTextStyle,
+        dataList: CommonUtils.dataList,
+        // jsonDataList: CommonUtils.jsonDataList,
         fixedCount: 2,
         onGenerateRowConfiguration: (rowIndex, rowChildren) {
           if (rowIndex == 3) {
             for (int i = 0; i < rowChildren.length; i++) {
               rowChildren[i] = (rowChildren[i]).copyWith(
-                  dataBackgroundColor: Colors.blueAccent,
+                  dataBackgroundColor: Colors.blue,
                   dataTextStyle: const TextStyle(
                     color: Colors.white,
                   ));
@@ -173,19 +131,22 @@ class _DemoScreenState extends State<DemoScreen> {
 
 ## Parameters
 
-| Parameters                   | Description                                                                                                                                          |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `headers`                    | **Required**. A list of `EachCell` widgets representing the headers for all columns, both fixed and scrollable.                                      |
-| `columnChildren`             | **Required**. A list of lists containing the children for all columns, both fixed and scrollable. Each inner list corresponds to a column.           |
-| `fixedCount`                 | **Required**. The number of columns that are fixed (not scrollable horizontally).                                                                    |
-| `totalWidth`                 | **Required**. The total width of the table.                                                                                                          |
-| `height`                     | Optional. The total height of the table. Default is 500.                                                                                             |
-| `isAscending`                | Optional. Whether the sorting is in ascending order. Default is true.                                                                                |
-| `tableBorder`                | Optional. The border for the table, provided as a `BoxBorder`.                                                                                       |
-| `draggableIcon`              | Optional. The icon displayed for dragging to adjust the column width.                                                                                |
-| `headerTextStyle`            | Optional. The text style applied to the header cells.                                                                                                |
-| `dataTextStyle`              | Optional. The text style applied to the data cells.                                                                                                  |
-| `onGenerateRowConfiguration` | Optional. A callback function that takes the row index and a list of `EachCell` for that row. Used to customize row-specific properties dynamically. |
+| Parameters                   | Description                                                                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `headers`                    | A list of `EachCell` widgets representing the headers for all columns, both fixed and scrollable.                                          |
+| `dataList`                   | A list of lists representing row-wise data. ( **Note**: headers must be provided for dataList )                                            |
+| `jsonDataList`               | A list of maps representing row-wise data. Any missing data will automatically be replaced with "--"                                       |
+| `fixedCount`                 | **Required**. The number of columns that are fixed (not scrollable horizontally).                                                          |
+| `totalWidth`                 | **Required**. The total width of the table.                                                                                                |
+| `height`                     | The total height of the table. Default is 500.                                                                                             |
+| `headerTextStyle`            | The text style applied to the header cells.                                                                                                |
+| `dataTextStyle`              | The text style applied to the data cells.                                                                                                  |
+| `isAscending`                | Whether the sorting is in ascending order. Default is true.                                                                                |
+| `tableBorder`                | The border for the table, provided as a `BoxBorder`.                                                                                       |
+| `tableDividerThickness`      | Specifies the thickness of the dividers between the rows of the table. Default is 1.0.                                                     |
+| `tableDividerColor`          | Specifies the color of the dividers between the rows of the table. Default is Colors.black                                                 |
+| `draggableIcon`              | The icon displayed for dragging to adjust the column width.                                                                                |
+| `onGenerateRowConfiguration` | A callback function that takes the row index and a list of `EachCell` for that row. Used to customize row-specific properties dynamically. |
 
 ## EachCell Parameters
 
