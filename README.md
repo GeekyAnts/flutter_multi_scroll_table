@@ -141,6 +141,8 @@ class _DemoScreenState extends State<DemoScreen> {
 | `height`                     | The total height of the table. Default is 500.                                                                                             |
 | `headerTextStyle`            | The text style applied to the header cells.                                                                                                |
 | `dataTextStyle`              | The text style applied to the data cells.                                                                                                  |
+| `headerBackgroundColor`      | The background color to be applied to all header cells.                                                                                    |
+| `dataBackgroundColor`        | The background color to be applied to all data cells.                                                                                      |
 | `isAscending`                | Whether the sorting is in ascending order. Default is true.                                                                                |
 | `tableBorder`                | The border for the table, provided as a `BoxBorder`.                                                                                       |
 | `tableDividerThickness`      | Specifies the thickness of the dividers between the rows of the table. Default is 1.0.                                                     |

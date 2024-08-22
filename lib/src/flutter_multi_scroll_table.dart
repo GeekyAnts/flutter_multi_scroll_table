@@ -35,6 +35,12 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// The text style to be applied to all the data cells.
   final TextStyle? dataTextStyle;
 
+  /// The background color to be applied to all header cells.
+  final Color? headerBackgroundColor;
+
+  /// The background color to be applied to all data cells.
+  final Color? dataBackgroundColor;
+
   /// The border for the entire table. Defaults to a grey border if not provided.
   final BoxBorder? tableBorder;
 
@@ -71,6 +77,8 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.tableDividerThickness,
     this.tableDividerColor,
     this.jsonDataList,
+    this.headerBackgroundColor,
+    this.dataBackgroundColor,
   });
 
   @override
@@ -519,7 +527,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                   headerTextStyle: headerTextStyle,
                                   isHeader: true,
                                   headerBackgroundColor:
-                                      eachCell.headerBackgroundColor,
+                                      widget.headerBackgroundColor ??
+                                          eachCell.headerBackgroundColor,
                                 ),
                                 isExpandable: eachCell.isExpandable,
                                 isFixed: true,
@@ -552,7 +561,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                     children: [
                                       child.copyWith(
                                         dataBackgroundColor:
-                                            rowCell?.dataBackgroundColor,
+                                            widget.dataBackgroundColor ??
+                                                rowCell?.dataBackgroundColor,
                                         dataTextStyle: rowCell?.dataTextStyle ??
                                             dataTextStyle,
                                         width: rowCell?.width ?? child.width,
@@ -600,7 +610,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                           height: eachCell.height,
                                           isHeader: true,
                                           headerTextStyle: headerTextStyle,
-                                          headerBackgroundColor:
+                                          headerBackgroundColor: widget
+                                                  .headerBackgroundColor ??
                                               eachCell.headerBackgroundColor,
                                         ),
                                         isExpandable: eachCell.isExpandable,
@@ -637,8 +648,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                           return Column(
                                             children: [
                                               child.copyWith(
-                                                dataBackgroundColor: rowCell
-                                                    ?.dataBackgroundColor,
+                                                dataBackgroundColor: widget
+                                                        .dataBackgroundColor ??
+                                                    rowCell
+                                                        ?.dataBackgroundColor,
                                                 dataTextStyle:
                                                     rowCell?.dataTextStyle ??
                                                         dataTextStyle,
