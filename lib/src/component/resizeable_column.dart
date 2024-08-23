@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../flutter_multi_scroll_table.dart';
 
-class ResizableColumn extends StatefulWidget {
+class ResizeableColumn extends StatefulWidget {
   final double initialWidth;
   final Widget header;
   final List<Widget> children;
@@ -13,8 +13,9 @@ class ResizableColumn extends StatefulWidget {
   final double? tableDividerThickness;
   final Color? tableDividerColor;
   final Function(double) onWidthChanged;
+  final VoidCallback? onSortColumn;
 
-  const ResizableColumn({
+  const ResizeableColumn({
     Key? key,
     required this.initialWidth,
     required this.header,
@@ -27,13 +28,14 @@ class ResizableColumn extends StatefulWidget {
     required this.onWidthChanged,
     this.tableDividerThickness,
     this.tableDividerColor,
+    this.onSortColumn,
   }) : super(key: key);
 
   @override
-  State<ResizableColumn> createState() => _ResizableColumnState();
+  State<ResizeableColumn> createState() => _ResizeableColumnState();
 }
 
-class _ResizableColumnState extends State<ResizableColumn> {
+class _ResizeableColumnState extends State<ResizeableColumn> {
   late double _width;
 
   @override
@@ -60,47 +62,50 @@ class _ResizableColumnState extends State<ResizableColumn> {
           width: _width,
           child: Column(
             children: [
-              Container(
-                color: headerBackgroundColor,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: widget.header is EachCell
-                          ? (widget.header as EachCell).copyWith(width: _width)
-                          : widget.header,
-                    ),
-                    if (widget.isExpandable)
-                      MouseRegion(
-                        cursor: SystemMouseCursors.resizeLeftRight,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onHorizontalDragUpdate: (details) {
-                            setState(() {
-                              final newWidth = _width + details.delta.dx;
-
-                              // Ensure width does not exceed the available width
-                              if (widget.isFixed) {
-                                if (newWidth >= widget.initialWidth &&
-                                    newWidth <= widget.availableWidth) {
-                                  _width = newWidth;
-                                  widget.onWidthChanged(details.delta.dx);
-                                } else if (newWidth < widget.initialWidth) {
-                                  _width = widget.initialWidth;
-                                }
-                              } else if (newWidth >= widget.initialWidth) {
-                                _width = newWidth;
-                              }
-                            });
-                          },
-                          child: widget.draggableIcon ??
-                              const Icon(
-                                Icons.chevron_right,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                        ),
+              GestureDetector(
+                onTap: widget.onSortColumn,
+                child: Container(
+                  color: headerBackgroundColor,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: widget.header is EachCell
+                            ? (widget.header as EachCell)
+                                .copyWith(width: _width)
+                            : widget.header,
                       ),
-                  ],
+                      if (widget.isExpandable)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.resizeLeftRight,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onHorizontalDragUpdate: (details) {
+                              setState(() {
+                                final newWidth = _width + details.delta.dx;
+
+                                if (widget.isFixed) {
+                                  if (newWidth >= widget.initialWidth &&
+                                      newWidth <= widget.availableWidth) {
+                                    _width = newWidth;
+                                    widget.onWidthChanged(details.delta.dx);
+                                  } else if (newWidth < widget.initialWidth) {
+                                    _width = widget.initialWidth;
+                                  }
+                                } else if (newWidth >= widget.initialWidth) {
+                                  _width = newWidth;
+                                }
+                              });
+                            },
+                            child: widget.draggableIcon ??
+                                const Icon(
+                                  Icons.chevron_right,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
               Divider(

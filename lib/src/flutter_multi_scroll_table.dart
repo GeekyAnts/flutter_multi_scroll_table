@@ -57,7 +57,6 @@ class FlutterMultiScrollTable extends StatefulWidget {
 
   /// A callback function that allows dynamic configuration of rows based on their index.
   /// It takes the row index and a list of `EachCell` widgets representing the row as parameters.
-
   final void Function(int, List<EachCell>)? onGenerateRowConfiguration;
 
   /// Creates a [FlutterMultiScrollTable] widget.
@@ -506,175 +505,207 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                     controller: _verticalScrollController,
                     child: Row(
                       children: [
-                        GestureDetector(
-                          onTap: _sortColumn,
-                          child: Row(
-                            children: (widget.headers ?? jsonHeaders)!
-                                .take(widget.fixedCount)
-                                .map((header) {
-                              final eachCell = header;
-                              final headerTextStyle = widget.headerTextStyle ??
-                                  eachCell.headerTextStyle;
-                              final dataTextStyle = widget.dataTextStyle ??
-                                  eachCell.dataTextStyle;
+                        Row(
+                          children: (widget.headers ?? jsonHeaders)!
+                              .take(widget.fixedCount)
+                              .map((header) {
+                            final eachCell = header;
+                            final headerTextStyle = widget.headerTextStyle ??
+                                eachCell.headerTextStyle;
+                            final dataTextStyle =
+                                widget.dataTextStyle ?? eachCell.dataTextStyle;
 
-                              return ResizableColumn(
-                                initialWidth: eachCell.width ?? 100,
-                                header: EachCell(
-                                  text: eachCell.text,
-                                  width: eachCell.width,
-                                  height: eachCell.height,
-                                  headerTextStyle: headerTextStyle,
-                                  isHeader: true,
-                                  headerBackgroundColor:
-                                      widget.headerBackgroundColor ??
-                                          eachCell.headerBackgroundColor,
-                                ),
-                                isExpandable: eachCell.isExpandable,
-                                isFixed: true,
-                                draggableIcon: widget.draggableIcon,
-                                maxWidth: MediaQuery.of(context).size.width,
-                                availableWidth: _remainingWidth,
-                                onWidthChanged: _onWidthChanged,
-                                tableDividerThickness:
-                                    widget.tableDividerThickness,
-                                tableDividerColor: widget.tableDividerColor,
-                                children: styledColumnChildren[
-                                        (widget.headers ?? jsonHeaders)!
-                                            .indexOf(header)]
-                                    .map((child) {
-                                  // Get the row index and column index for the child
-                                  final columnIndex = styledColumnChildren
-                                      .indexOf(styledColumnChildren.firstWhere(
-                                          (col) => col.contains(child)));
-                                  final rowIndex = styledColumnChildren
-                                      .firstWhere((col) => col.contains(child))
-                                      .indexOf(child);
+                            return ResizeableColumn(
+                              initialWidth: eachCell.width ?? 100,
+                              header: EachCell(
+                                text: eachCell.text,
+                                width: eachCell.width,
+                                height: eachCell.height,
+                                headerTextStyle: headerTextStyle,
+                                isHeader: true,
+                                headerBackgroundColor:
+                                    widget.headerBackgroundColor ??
+                                        eachCell.headerBackgroundColor,
+                              ),
+                              isExpandable: eachCell.isExpandable,
+                              isFixed: true,
+                              draggableIcon: widget.draggableIcon,
+                              maxWidth: MediaQuery.of(context).size.width,
+                              availableWidth: _remainingWidth,
+                              onWidthChanged: _onWidthChanged,
+                              onSortColumn: _sortColumn,
+                              tableDividerThickness:
+                                  widget.tableDividerThickness,
+                              tableDividerColor: widget.tableDividerColor,
+                              children: styledColumnChildren[
+                                      (widget.headers ?? jsonHeaders)!
+                                          .indexOf(header)]
+                                  .asMap()
+                                  .map((index, child) {
+                                    // Get the row index and column index for the child
+                                    final columnIndex =
+                                        styledColumnChildren.indexOf(
+                                      styledColumnChildren.firstWhere(
+                                          (col) => col.contains(child)),
+                                    );
+                                    final rowIndex = styledColumnChildren
+                                        .firstWhere(
+                                            (col) => col.contains(child))
+                                        .indexOf(child);
 
-                                  // Apply styles from _rowConfigurations
-                                  final rowConfig =
-                                      _rowConfigurations[rowIndex];
-                                  final EachCell? rowCell =
-                                      rowConfig?[columnIndex];
+                                    // Apply styles from _rowConfigurations
+                                    final rowConfig =
+                                        _rowConfigurations[rowIndex];
+                                    final EachCell? rowCell =
+                                        rowConfig?[columnIndex];
 
-                                  return Column(
-                                    children: [
-                                      child.copyWith(
-                                        dataBackgroundColor:
-                                            widget.dataBackgroundColor ??
+                                    return MapEntry(
+                                      index,
+                                      Column(
+                                        children: [
+                                          child.copyWith(
+                                            dataBackgroundColor: widget
+                                                    .dataBackgroundColor ??
                                                 rowCell?.dataBackgroundColor,
-                                        dataTextStyle: rowCell?.dataTextStyle ??
-                                            dataTextStyle,
-                                        width: rowCell?.width ?? child.width,
-                                        height: rowCell?.height ?? child.height,
+                                            dataTextStyle:
+                                                rowCell?.dataTextStyle ??
+                                                    dataTextStyle,
+                                            width:
+                                                rowCell?.width ?? child.width,
+                                            height:
+                                                rowCell?.height ?? child.height,
+                                          ),
+                                          if (index <
+                                              styledColumnChildren[
+                                                          (widget.headers ??
+                                                                  jsonHeaders)!
+                                                              .indexOf(header)]
+                                                      .length -
+                                                  1)
+                                            Divider(
+                                              height: 1,
+                                              thickness:
+                                                  widget.tableDividerThickness,
+                                              color: widget.tableDividerColor,
+                                            ),
+                                        ],
                                       ),
-                                      Divider(
-                                        height: 1,
-                                        thickness: widget.tableDividerThickness,
-                                        color: widget.tableDividerColor,
-                                      ),
-                                    ],
-                                  );
-                                }).toList(),
-                              );
-                            }).toList(),
-                          ),
+                                    );
+                                  })
+                                  .values
+                                  .toList(),
+                            );
+                          }).toList(),
                         ),
                         Flexible(
-                          child: GestureDetector(
-                            onTap: _sortColumn,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  controller: _horizontalScrollController,
-                                  child: Row(
-                                    children: (widget.headers ?? jsonHeaders)!
-                                        .skip(widget.fixedCount)
-                                        .map((header) {
-                                      final eachCell = header;
-                                      final headerTextStyle =
-                                          widget.headerTextStyle ??
-                                              eachCell.headerTextStyle;
-                                      final dataTextStyle =
-                                          widget.dataTextStyle ??
-                                              eachCell.dataTextStyle;
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                controller: _horizontalScrollController,
+                                child: Row(
+                                  children: (widget.headers ?? jsonHeaders)!
+                                      .skip(widget.fixedCount)
+                                      .map((header) {
+                                    final eachCell = header;
+                                    final headerTextStyle =
+                                        widget.headerTextStyle ??
+                                            eachCell.headerTextStyle;
+                                    final dataTextStyle =
+                                        widget.dataTextStyle ??
+                                            eachCell.dataTextStyle;
 
-                                      return ResizableColumn(
-                                        initialWidth: eachCell.width ?? 100,
-                                        header: EachCell(
-                                          text: eachCell.text,
-                                          width: eachCell.width,
-                                          height: eachCell.height,
-                                          isHeader: true,
-                                          headerTextStyle: headerTextStyle,
-                                          headerBackgroundColor: widget
-                                                  .headerBackgroundColor ??
-                                              eachCell.headerBackgroundColor,
-                                        ),
-                                        isExpandable: eachCell.isExpandable,
-                                        draggableIcon: widget.draggableIcon,
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width,
-                                        availableWidth: _remainingWidth,
-                                        tableDividerThickness:
-                                            widget.tableDividerThickness,
-                                        tableDividerColor:
-                                            widget.tableDividerColor,
-                                        onWidthChanged: _onWidthChanged,
-                                        children: styledColumnChildren[
-                                                (widget.headers ?? jsonHeaders)!
-                                                    .indexOf(header)]
-                                            .map((child) {
-                                          // Get the row index and column index for the child
-                                          final columnIndex =
-                                              styledColumnChildren.indexOf(
-                                                  styledColumnChildren
-                                                      .firstWhere((col) =>
-                                                          col.contains(child)));
-                                          final rowIndex = styledColumnChildren
-                                              .firstWhere(
-                                                  (col) => col.contains(child))
-                                              .indexOf(child);
+                                    return ResizeableColumn(
+                                      initialWidth: eachCell.width ?? 100,
+                                      header: EachCell(
+                                        text: eachCell.text,
+                                        width: eachCell.width,
+                                        height: eachCell.height,
+                                        isHeader: true,
+                                        headerTextStyle: headerTextStyle,
+                                        headerBackgroundColor:
+                                            widget.headerBackgroundColor ??
+                                                eachCell.headerBackgroundColor,
+                                      ),
+                                      isExpandable: eachCell.isExpandable,
+                                      draggableIcon: widget.draggableIcon,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width,
+                                      availableWidth: _remainingWidth,
+                                      tableDividerThickness:
+                                          widget.tableDividerThickness,
+                                      tableDividerColor:
+                                          widget.tableDividerColor,
+                                      onWidthChanged: _onWidthChanged,
+                                      onSortColumn: _sortColumn,
+                                      children: styledColumnChildren[
+                                              (widget.headers ?? jsonHeaders)!
+                                                  .indexOf(header)]
+                                          .asMap()
+                                          .map((index, child) {
+                                            // Get the row index and column index for the child
+                                            final columnIndex =
+                                                styledColumnChildren.indexOf(
+                                              styledColumnChildren.firstWhere(
+                                                  (col) => col.contains(child)),
+                                            );
+                                            final rowIndex =
+                                                styledColumnChildren
+                                                    .firstWhere((col) =>
+                                                        col.contains(child))
+                                                    .indexOf(child);
 
-                                          // Apply styles from _rowConfigurations
-                                          final rowConfig =
-                                              _rowConfigurations[rowIndex];
-                                          final EachCell? rowCell =
-                                              rowConfig?[columnIndex];
+                                            // Apply styles from _rowConfigurations
+                                            final rowConfig =
+                                                _rowConfigurations[rowIndex];
+                                            final EachCell? rowCell =
+                                                rowConfig?[columnIndex];
 
-                                          return Column(
-                                            children: [
-                                              child.copyWith(
-                                                dataBackgroundColor: widget
-                                                        .dataBackgroundColor ??
-                                                    rowCell
-                                                        ?.dataBackgroundColor,
-                                                dataTextStyle:
-                                                    rowCell?.dataTextStyle ??
+                                            return MapEntry(
+                                              index,
+                                              Column(
+                                                children: [
+                                                  child.copyWith(
+                                                    dataBackgroundColor: widget
+                                                            .dataBackgroundColor ??
+                                                        rowCell
+                                                            ?.dataBackgroundColor,
+                                                    dataTextStyle: rowCell
+                                                            ?.dataTextStyle ??
                                                         dataTextStyle,
-                                                width: rowCell?.width ??
-                                                    child.width,
-                                                height: rowCell?.height ??
-                                                    child.height,
+                                                    width: rowCell?.width ??
+                                                        child.width,
+                                                    height: rowCell?.height ??
+                                                        child.height,
+                                                  ),
+                                                  if (index <
+                                                      styledColumnChildren[(widget
+                                                                          .headers ??
+                                                                      jsonHeaders)!
+                                                                  .indexOf(
+                                                                      header)]
+                                                              .length -
+                                                          1)
+                                                    Divider(
+                                                      height: 1,
+                                                      thickness: widget
+                                                          .tableDividerThickness,
+                                                      color: widget
+                                                          .tableDividerColor,
+                                                    ),
+                                                ],
                                               ),
-                                              Divider(
-                                                height: 1,
-                                                thickness: widget
-                                                    .tableDividerThickness,
-                                                color: widget.tableDividerColor,
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
-                                      );
-                                    }).toList(),
-                                  ),
+                                            );
+                                          })
+                                          .values
+                                          .toList(),
+                                    );
+                                  }).toList(),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
