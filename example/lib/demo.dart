@@ -10,17 +10,18 @@ class DemoScreen extends StatefulWidget {
 }
 
 class _DemoScreenState extends State<DemoScreen> {
+  // Define your headerTextStyle
   final TextStyle? headerTextStyle = const TextStyle(
     fontWeight: FontWeight.bold,
   );
-
+  // Define your dataTextStyle
   final TextStyle? dataTextStyle = const TextStyle(
     fontWeight: FontWeight.w200,
   );
 
   @override
   Widget build(BuildContext context) {
-    // // Column Headers list
+    // Column Headers list
     final headers = [
       const EachCell(
         text: "Sr. No",
@@ -79,8 +80,7 @@ class _DemoScreenState extends State<DemoScreen> {
         height: 480,
         headers: headers,
         headerTextStyle: headerTextStyle,
-        //dataList: CommonUtils.dataList,
-        jsonDataList: CommonUtils.jsonDataList,
+        dataList: CommonUtils.dataList,
         fixedCount: 2,
         onGenerateRowConfiguration: (rowIndex, rowChildren) {
           if (rowIndex == 3) {
