@@ -540,6 +540,7 @@ class _DemoScreenState extends State<DemoScreen> {
 | `tableBorder`                | The border for the table, provided as a `BoxBorder`.                                                                                       |
 | `tableDividerThickness`      | Specifies the thickness of the dividers between the rows of the table. Default is 1.0.                                                     |
 | `tableDividerColor`          | Specifies the color of the dividers between the rows of the table. Default is Colors.black                                                 |
+| `dataPlaceholder`            | A placeholder string that will be used to replace any missing or null data in the table.                                                   |
 | `draggableIcon`              | The icon displayed for dragging to adjust the column width.                                                                                |
 | `onGenerateRowConfiguration` | A callback function that takes the row index and a list of `EachCell` for that row. Used to customize row-specific properties dynamically. |
 

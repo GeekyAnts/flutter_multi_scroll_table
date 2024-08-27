@@ -55,6 +55,10 @@ class FlutterMultiScrollTable extends StatefulWidget {
   /// A custom widget to use as the draggable icon for resizing columns.
   final Widget? draggableIcon;
 
+  /// A placeholder string that will be used to replace any missing or null data in the table.
+  /// For example, if a data cell is empty or has a null value, this string will be displayed instead.
+  final String? dataPlaceholder;
+
   /// A callback function that allows dynamic configuration of rows based on their index.
   /// It takes the row index and a list of `EachCell` widgets representing the row as parameters.
   final void Function(int, List<EachCell>)? onGenerateRowConfiguration;
@@ -78,6 +82,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
     this.jsonDataList,
     this.headerBackgroundColor,
     this.dataBackgroundColor,
+    this.dataPlaceholder,
   });
 
   @override
@@ -263,7 +268,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     for (final map in jsonDataList) {
       for (int i = 0; i < headers.length; i++) {
-        final value = map[headers[i]] ?? '--';
+        final value = map[headers[i]] ?? widget.dataPlaceholder ?? '--';
         columnWiseData[i].add(value);
       }
     }
@@ -285,9 +290,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
     for (final row in dataList) {
       for (int colIndex = 0; colIndex < numCols; colIndex++) {
-        // Add data or "NA" if the column data is missing
-        columnWiseData[colIndex]
-            .add(colIndex < row.length ? row[colIndex] : "--");
+        // Add data or use dataPlaceholder if the column data is missing
+        columnWiseData[colIndex].add(colIndex < row.length
+            ? row[colIndex]
+            : widget.dataPlaceholder ?? "--");
       }
     }
 

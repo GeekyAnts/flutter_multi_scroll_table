@@ -80,8 +80,8 @@ class _DemoScreenState extends State<DemoScreen> {
         height: 480,
         headers: headers,
         headerTextStyle: headerTextStyle,
-        dataList: CommonUtils.dataList,
-        // jsonDataList: CommonUtils.jsonDataList,
+        // dataList: CommonUtils.dataList,
+        jsonDataList: CommonUtils.jsonDataList,
         fixedCount: 2,
         onGenerateRowConfiguration: (rowIndex, rowChildren) {
           if (rowIndex == 3) {
