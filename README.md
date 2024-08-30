@@ -520,31 +520,29 @@ class _DemoScreenState extends State<DemoScreen> {
 
 ```
 
+##### Fixed Column Table Example ([Source Code](/example/lib/samples/fixed_column_table.dart))
 
 https://github.com/user-attachments/assets/1722ad98-21f0-4b34-8c2f-7c70438b7f3f
 
-
+##### Scrollable Column Table Example ([Source Code](/example/lib/samples/scrollable_table.dart))
 
 https://github.com/user-attachments/assets/c0c8e69a-f25d-4361-a406-be14bb39c5f6
 
-
+##### Styled Table Example ([Source Code](/example/lib/samples/styled_scrollable_table.dart))
 
 https://github.com/user-attachments/assets/e7448149-1db2-4d57-b0f6-3cebdb82d927
 
-
+##### JSON Data Table Example ([Source Code](/example/lib/samples/json_data_table.dart))
 
 https://github.com/user-attachments/assets/6367514b-1432-4a4f-93a4-b491648529a4
 
-
+##### Specific Row Style Table Example ([Source Code](/example/lib/samples/specific_row_styling.dart))
 
 https://github.com/user-attachments/assets/df3dae3c-d3e8-4e2d-9683-1daf84987790
 
+##### Expandable Column Table Example ([Source Code](/example/lib/samples/expandable_column_table.dart))
 
 https://github.com/user-attachments/assets/81207fd9-bb6d-4be1-a8ea-fbf4613f237f
-
-
-
-
 
 ## Parameters
 
