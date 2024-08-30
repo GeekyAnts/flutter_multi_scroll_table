@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/src/utils/utils.dart';
 import '../flutter_multi_scroll_table.dart';
@@ -98,6 +99,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
   final bool _isHeaderScrolling = false;
 
   double _remainingWidth = 0;
+
+  double? adjustedHeight;
 
   // Store styles for EachCell
   final Map<int, Map<int, EachCell>> _rowConfigurations = {};
@@ -465,10 +468,14 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   @override
   Widget build(BuildContext context) {
-    double adjustedHeight =
-        MediaQuery.of(context).orientation == Orientation.landscape
-            ? MediaQuery.of(context).size.height * 0.8
-            : widget.height ?? 500;
+    if (!kIsWeb) {
+      adjustedHeight =
+          MediaQuery.of(context).orientation == Orientation.landscape
+              ? MediaQuery.of(context).size.height * 0.8
+              : widget.height ?? 500;
+    } else {
+      adjustedHeight = widget.height ?? 500;
+    }
 
     _updateRemainingWidth();
 
@@ -516,10 +523,13 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                               .take(widget.fixedCount)
                               .map((header) {
                             final eachCell = header;
-                            final headerTextStyle = widget.headerTextStyle ??
-                                eachCell.headerTextStyle;
+
+                            // Apply specific headerTextStyle if defined, otherwise use top-level headerTextStyle
+                            final headerTextStyle = eachCell.headerTextStyle ??
+                                widget.headerTextStyle;
+
                             final dataTextStyle =
-                                widget.dataTextStyle ?? eachCell.dataTextStyle;
+                                eachCell.dataTextStyle ?? widget.dataTextStyle;
 
                             return ResizeableColumn(
                               initialWidth: eachCell.width ?? 100,
@@ -530,8 +540,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 headerTextStyle: headerTextStyle,
                                 isHeader: true,
                                 headerBackgroundColor:
-                                    widget.headerBackgroundColor ??
-                                        eachCell.headerBackgroundColor,
+                                    eachCell.headerBackgroundColor ??
+                                        widget.headerBackgroundColor,
                               ),
                               isExpandable: eachCell.isExpandable,
                               isFixed: true,
@@ -570,9 +580,9 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                       Column(
                                         children: [
                                           child.copyWith(
-                                            dataBackgroundColor: widget
-                                                    .dataBackgroundColor ??
-                                                rowCell?.dataBackgroundColor,
+                                            dataBackgroundColor:
+                                                rowCell?.dataBackgroundColor ??
+                                                    widget.dataBackgroundColor,
                                             dataTextStyle:
                                                 rowCell?.dataTextStyle ??
                                                     dataTextStyle,
@@ -616,12 +626,15 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                       .skip(widget.fixedCount)
                                       .map((header) {
                                     final eachCell = header;
+
+                                    // Apply specific headerTextStyle if defined, otherwise use top-level headerTextStyle
                                     final headerTextStyle =
-                                        widget.headerTextStyle ??
-                                            eachCell.headerTextStyle;
+                                        eachCell.headerTextStyle ??
+                                            widget.headerTextStyle;
+
                                     final dataTextStyle =
-                                        widget.dataTextStyle ??
-                                            eachCell.dataTextStyle;
+                                        eachCell.dataTextStyle ??
+                                            widget.dataTextStyle;
 
                                     return ResizeableColumn(
                                       initialWidth: eachCell.width ?? 100,
@@ -632,8 +645,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                         isHeader: true,
                                         headerTextStyle: headerTextStyle,
                                         headerBackgroundColor:
-                                            widget.headerBackgroundColor ??
-                                                eachCell.headerBackgroundColor,
+                                            eachCell.headerBackgroundColor ??
+                                                widget.headerBackgroundColor,
                                       ),
                                       isExpandable: eachCell.isExpandable,
                                       draggableIcon: widget.draggableIcon,
@@ -674,10 +687,10 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                               Column(
                                                 children: [
                                                   child.copyWith(
-                                                    dataBackgroundColor: widget
-                                                            .dataBackgroundColor ??
-                                                        rowCell
-                                                            ?.dataBackgroundColor,
+                                                    dataBackgroundColor: rowCell
+                                                            ?.dataBackgroundColor ??
+                                                        widget
+                                                            .dataBackgroundColor,
                                                     dataTextStyle: rowCell
                                                             ?.dataTextStyle ??
                                                         dataTextStyle,
