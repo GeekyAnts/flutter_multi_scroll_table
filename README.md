@@ -21,7 +21,7 @@ Add the package to your dependencies:
 ```yaml
 dependencies:
 
-flutter_multi_scroll_table: ^0.0.1
+flutter_multi_scroll_table: ^1.1.0
 ```
 
 ## Usage
