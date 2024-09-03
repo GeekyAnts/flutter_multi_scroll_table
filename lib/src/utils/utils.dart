@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../component/each_cell.dart';
+import '../../flutter_multi_scroll_table.dart';
 
 class Utils {
   static int compareTexts(String textA, String textB) {
@@ -43,17 +43,15 @@ class Utils {
   }
 
   static String getTextFromWidget(Widget widget) {
-    if (widget is Column && widget.children.isNotEmpty) {
-      if (widget.children.first is EachCell) {
-        return (widget.children.first as EachCell).text;
-      }
-    }
     if (widget is EachCell) {
       return widget.text;
     }
-
     return '';
   }
+
+  // static int compareTexts(String textA, String textB) {
+  //   return textA.compareTo(textB);
+  // }
 
   static int compare(dynamic a, dynamic b) {
     if (a is num && b is num) {

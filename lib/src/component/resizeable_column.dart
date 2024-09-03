@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../flutter_multi_scroll_table.dart';
 
-class ResizableColumn extends StatefulWidget {
+class ResizeableColumn extends StatefulWidget {
   final double initialWidth;
   final Widget header;
   final List<Widget> children;
   final bool isExpandable;
   final bool isFixed;
   final Widget? draggableIcon;
+  final double maxWidth;
+  final double availableWidth;
+  final double? tableDividerThickness;
+  final Color? tableDividerColor;
+  final Function(double) onWidthChanged;
+  final VoidCallback? onSortColumn;
 
-  const ResizableColumn({
+  const ResizeableColumn({
     Key? key,
     required this.initialWidth,
     required this.header,
@@ -17,13 +23,19 @@ class ResizableColumn extends StatefulWidget {
     required this.isExpandable,
     this.isFixed = false,
     this.draggableIcon,
+    required this.maxWidth,
+    required this.availableWidth,
+    required this.onWidthChanged,
+    this.tableDividerThickness,
+    this.tableDividerColor,
+    this.onSortColumn,
   }) : super(key: key);
 
   @override
-  State<ResizableColumn> createState() => _ResizableColumnState();
+  State<ResizeableColumn> createState() => _ResizeableColumnState();
 }
 
-class _ResizableColumnState extends State<ResizableColumn> {
+class _ResizeableColumnState extends State<ResizeableColumn> {
   late double _width;
 
   @override
@@ -34,7 +46,14 @@ class _ResizableColumnState extends State<ResizableColumn> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width * 0.8;
+    Color? headerBackgroundColor;
+    Color? dataBackgroundColor;
+
+    if (widget.header is EachCell) {
+      final eachCellHeader = widget.header as EachCell;
+      headerBackgroundColor = eachCellHeader.headerBackgroundColor;
+      dataBackgroundColor = eachCellHeader.dataBackgroundColor;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,57 +62,56 @@ class _ResizableColumnState extends State<ResizableColumn> {
           width: _width,
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: widget.header is EachCell
-                        ? (widget.header as EachCell).copyWith(width: _width)
-                        : widget.header,
-                  ),
-                  if (widget.isExpandable)
-                    MouseRegion(
-                      cursor: SystemMouseCursors.resizeLeftRight,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onHorizontalDragUpdate: (details) {
-                          setState(() {
-                            final newWidth = _width + details.delta.dx;
-
-                            if (widget.isFixed) {
-                              // Ensure the width does not exceed the screen width and is not less than the initial width when isFixed is true
-                              if (newWidth >= widget.initialWidth &&
-                                  newWidth <= screenWidth) {
-                                _width = newWidth;
-                              } else if (newWidth > screenWidth) {
-                                _width = screenWidth;
-                              } else if (newWidth < widget.initialWidth) {
-                                _width = widget.initialWidth;
-                              }
-                            } else {
-                              // Ensure the width is not less than the initial width when isFixed is false
-                              if (newWidth >= widget.initialWidth) {
-                                _width = newWidth;
-                              } else {
-                                _width = widget.initialWidth;
-                              }
-                            }
-                          });
-                        },
-                        child: widget.draggableIcon ??
-                            const Icon(
-                              Icons.chevron_right,
-                              size: 20,
-                              color: Colors.grey,
-                            ),
+              GestureDetector(
+                onTap: widget.onSortColumn,
+                child: Container(
+                  color: headerBackgroundColor,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: widget.header is EachCell
+                            ? (widget.header as EachCell)
+                                .copyWith(width: _width)
+                            : widget.header,
                       ),
-                    ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: const Divider(
-                  height: 1,
+                      if (widget.isExpandable)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.resizeLeftRight,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onHorizontalDragUpdate: (details) {
+                              setState(() {
+                                final newWidth = _width + details.delta.dx;
+
+                                if (widget.isFixed) {
+                                  if (newWidth >= widget.initialWidth &&
+                                      newWidth <= widget.availableWidth) {
+                                    _width = newWidth;
+                                    widget.onWidthChanged(details.delta.dx);
+                                  } else if (newWidth < widget.initialWidth) {
+                                    _width = widget.initialWidth;
+                                  }
+                                } else if (newWidth >= widget.initialWidth) {
+                                  _width = newWidth;
+                                }
+                              });
+                            },
+                            child: widget.draggableIcon ??
+                                const Icon(
+                                  Icons.chevron_right,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
+              ),
+              Divider(
+                height: 1,
+                thickness: widget.tableDividerThickness,
+                color: widget.tableDividerColor,
               ),
             ],
           ),
@@ -104,8 +122,9 @@ class _ResizableColumnState extends State<ResizableColumn> {
             return SizedBox(
               width: _width,
               child: child is EachCell
-                  ? (child).copyWith(
+                  ? child.copyWith(
                       width: _width,
+                      dataBackgroundColor: dataBackgroundColor,
                     )
                   : child,
             );

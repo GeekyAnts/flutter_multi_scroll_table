@@ -1,3 +1,5 @@
+import 'package:example/screens/widgets/appbar.dart';
+import 'package:example/utils/strings.dart';
 import 'package:example/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_scroll_table/flutter_multi_scroll_table.dart';
@@ -73,27 +75,31 @@ class _DemoScreenState extends State<DemoScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: const TableAppBar(
+        title: AppStrings.appTitle,
+      ),
       backgroundColor: Colors.white,
-      body: FlutterMultiScrollTable(
-        totalWidth: 900,
-        height: 480,
-        headers: headers,
-        headerTextStyle: headerTextStyle,
-        // dataList: CommonUtils.dataList,
-        jsonDataList: CommonUtils.jsonDataList,
-        fixedCount: 2,
-        onGenerateRowConfiguration: (rowIndex, rowChildren) {
-          if (rowIndex == 3) {
-            for (int i = 0; i < rowChildren.length; i++) {
-              rowChildren[i] = (rowChildren[i]).copyWith(
-                  dataBackgroundColor: Colors.blue,
-                  dataTextStyle: const TextStyle(
-                    color: Colors.white,
-                  ));
+      body: Center(
+        child: FlutterMultiScrollTable(
+          totalWidth: 900,
+          height: 480,
+          headers: headers,
+          headerTextStyle: headerTextStyle,
+          // dataList: CommonUtils.dataList,
+          jsonDataList: CommonUtils.jsonDataList,
+          fixedCount: 2,
+          onGenerateRowConfiguration: (rowIndex, rowChildren) {
+            if (rowIndex == 3) {
+              for (int i = 0; i < rowChildren.length; i++) {
+                rowChildren[i] = (rowChildren[i]).copyWith(
+                    dataBackgroundColor: Colors.blue,
+                    dataTextStyle: const TextStyle(
+                      color: Colors.white,
+                    ));
+              }
             }
-          }
-        },
+          },
+        ),
       ),
     );
   }

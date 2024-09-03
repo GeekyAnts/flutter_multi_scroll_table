@@ -1,147 +1,484 @@
-import 'dart:math';
-
 class CommonUtils {
-  static String generateRandomAlphabet() {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    final randomIndex = Random().nextInt(alphabet.length);
-    return alphabet[randomIndex];
-  }
-
-  static final List<String> names = [
-    "Alex Martin",
-    "John Doe",
-    "Jane Smith",
-    "Emily Johnson",
-    "Michael Brown",
-    "Jessy Williams",
-    "David Jones",
-    "Sarah Davis",
-    "Daniel Wilson",
-    "Laura Moore",
-    "Chris Taylor",
-    "Hannah Monte",
-    "James Thomas",
-    "Sophia John",
-    "Robert White",
-    "Emma Harris",
-    "Brian Martin",
-    "Olivia Jones",
-    "Kevin Lee",
-    "Isa Martin"
+  static final List<List<dynamic>> dataList = [
+    [
+      1,
+      'John Doe',
+      'New York',
+      'Apple',
+      'Tesla',
+      'USA',
+      '+1',
+      'X',
+      'Y',
+      'Z',
+      'W'
+    ],
+    [
+      2,
+      'Jane Smith',
+      'London',
+      'Banana',
+      'BMW',
+      'UK',
+      '+44',
+      'M',
+      'N',
+      'O',
+      'P'
+    ],
+    [
+      3,
+      'Alice Johnson',
+      'Sydney',
+      'Orange',
+      'Mercedes',
+      'Australia',
+      '+61',
+      'A1',
+      'B1',
+      'C1',
+      'D1'
+    ],
+    [
+      4,
+      'Michael Brown',
+      'Paris',
+      'Grapes',
+      'Audi',
+      'France',
+      '+33',
+      'E',
+      'F',
+      'G',
+      'H'
+    ],
+    [
+      5,
+      'Emily Davis',
+      'Berlin',
+      'Strawberry',
+      'Porsche',
+      'Germany',
+      '+49',
+      'I',
+      'J',
+      'K',
+      'L'
+    ],
+    [
+      6,
+      'Chris Wilson',
+      'Rome',
+      'Peach',
+      'Ferrari',
+      'Italy',
+      '+39',
+      'M',
+      'N',
+      'O',
+      'P'
+    ],
+    [
+      7,
+      'Jessica Lee',
+      'Madrid',
+      'Blueberry',
+      'Seat',
+      'Spain',
+      '+34',
+      'Q',
+      'R',
+      'S',
+      'T'
+    ],
+    [
+      8,
+      'David Martinez',
+      'Amsterdam',
+      'Pineapple',
+      'Volvo',
+      'Netherlands',
+      '+31',
+      'U',
+      'V',
+      'W',
+      'X'
+    ],
+    [
+      9,
+      'Sophia Clark',
+      'Vienna',
+      'Cherry',
+      'Skoda',
+      'Austria',
+      '+43',
+      'Y',
+      'Z',
+      'A2',
+      'B2'
+    ],
+    [
+      10,
+      'Daniel Lewis',
+      'Zurich',
+      'Mango',
+      'BMW',
+      'Switzerland',
+      '+41',
+      'C2',
+      'D2',
+      'E2',
+      'F2'
+    ],
+    [
+      11,
+      'Olivia Walker',
+      'Brussels',
+      'Melon',
+      'Audi',
+      'Belgium',
+      '+32',
+      'G2',
+      'H2',
+      'I2',
+      'J2'
+    ],
+    [
+      12,
+      'James Allen',
+      'Prague',
+      'Kiwi',
+      'Tesla',
+      'Czech Republic',
+      '+420',
+      'K2',
+      'L2',
+      'M2',
+      'N2'
+    ],
   ];
 
-  static final List<String> cities = [
-    "New York",
-    "Los Angeles",
-    "Chicago",
-    "Houston",
-    "Phoenix",
-    "Philadelphia",
-    "San Antonio",
-    "San Diego",
-    "Dallas",
-    "San Jose",
-    "Austin",
-    "Jacksonville",
-    "Fort Worth",
-    "Columbus",
-    "Charlotte",
-    "Japan",
-    "Delhi",
-    "Seattle",
-    "Denver",
-    "Washington"
+  static final List<List<dynamic>> footballTableData = [
+    [
+      1,
+      'Manchester United',
+      'Old Trafford',
+      'England',
+      '1878',
+      'Erik ten Hag',
+    ],
+    [2, 'Real Madrid', 'Santiago Bernabéu', 'Spain', '1902', 'Carlo Ancelotti'],
+    [3, 'Bayern Munich', 'Allianz Arena', 'Germany', '1900', 'Thomas Tuchel'],
+    [4, 'Barcelona', 'Camp Nou', 'Spain', '1899', 'Xavi Hernández'],
+    [5, 'Juventus', 'Allianz Stadium', 'Italy', '1897', 'Massimiliano Allegri'],
+    [
+      6,
+      'Paris Saint-Germain',
+      'Parc des Princes',
+      'France',
+      '1970',
+      'Luis Enrique'
+    ],
+    [7, 'Liverpool', 'Anfield', 'England', '1892', 'Jürgen Klopp'],
+    [8, 'Chelsea', 'Stamford Bridge', 'England', '1905', 'Mauricio Pochettino'],
+    [9, 'AC Milan', 'San Siro', 'Italy', '1899', 'Stefano Pioli'],
+    [
+      10,
+      'Borussia Dortmund',
+      'Signal Iduna Park',
+      'Germany',
+      '1909',
+      'Edin Terzić'
+    ],
+    [
+      11,
+      'Atletico Madrid',
+      'Wanda Metropolitano',
+      'Spain',
+      '1903',
+      'Diego Simeone'
+    ],
+    [12, 'Arsenal', 'Emirates Stadium', 'England', '1886', 'Mikel Arteta'],
+    [13, 'Inter Milan', 'San Siro', 'Italy', '1908', 'Simone Inzaghi'],
+    [
+      14,
+      'Tottenham Hotspur',
+      'Tottenham Hotspur Stadium',
+      'England',
+      '1882',
+      'Ange Postecoglou'
+    ],
+    [15, 'AS Roma', 'Stadio Olimpico', 'Italy', '1927', 'José Mourinho'],
+    [
+      16,
+      'Napoli',
+      'Stadio Diego Armando Maradona',
+      'Italy',
+      '1926',
+      'Rudi García'
+    ],
+    [17, 'Ajax', 'Johan Cruyff Arena', 'Netherlands', '1900', 'Maurice Steijn'],
+    [18, 'RB Leipzig', 'Red Bull Arena', 'Germany', '2009', 'Marco Rose'],
+    [
+      19,
+      'Sevilla',
+      'Ramón Sánchez Pizjuán Stadium',
+      'Spain',
+      '1890',
+      'Diego Alonso'
+    ],
+    [
+      20,
+      'Manchester City',
+      'Etihad Stadium',
+      'England',
+      '1880',
+      'Pep Guardiola'
+    ]
   ];
 
-  static final List<String> fruits = [
-    "Apple",
-    "Banana",
-    "Orange",
-    "Grapes",
-    "Mango",
-    "Pineapple",
-    "Strawberry",
-    "Blueberry",
-    "Cherry",
-    "Watermelon",
-    "Peach",
-    "Plum",
-    "Kiwi",
-    "Lemon",
-    "Lime",
-    "Pear",
-    "Apricot",
-    "Pomegranate",
-    "Papaya",
-    "Fig"
+  static final List<List<dynamic>> cricketTeamData = [
+    [1, 'India', 'Narendra Modi Stadium', 'India', '1932', 'Rohit Sharma'],
+    [
+      2,
+      'Australia',
+      'Melbourne Cricket Ground',
+      'Australia',
+      '1877',
+      'Pat Cummins'
+    ],
+    [3, 'England', 'Lord\'s', 'England', '1877', 'Jos Buttler'],
+    [4, 'Pakistan', 'Gaddafi Stadium', 'Pakistan', '1952', 'Babar Azam'],
+    [5, 'New Zealand', 'Eden Park', 'New Zealand', '1930', 'Kane Williamson'],
+    [
+      6,
+      'South Africa',
+      'The Wanderers',
+      'South Africa',
+      '1889',
+      'Temba Bavuma'
+    ],
+    [
+      7,
+      'Sri Lanka',
+      'R. Premadasa Stadium',
+      'Sri Lanka',
+      '1982',
+      'Dasun Shanaka'
+    ],
+    [8, 'West Indies', 'Kensington Oval', 'West Indies', '1928', 'Shai Hope'],
+    [
+      9,
+      'Bangladesh',
+      'Sher-e-Bangla National Stadium',
+      'Bangladesh',
+      '2000',
+      'Shakib Al Hasan'
+    ],
+    [
+      10,
+      'Afghanistan',
+      'Kabul International Stadium',
+      'Afghanistan',
+      '2017',
+      'Hashmatullah Shahidi'
+    ],
+    [11, 'Zimbabwe', 'Harare Sports Club', 'Zimbabwe', '1992', 'Craig Ervine'],
+    [
+      12,
+      'Ireland',
+      'Malahide Cricket Club Ground',
+      'Ireland',
+      '2018',
+      'Andrew Balbirnie'
+    ],
+    [
+      13,
+      'Netherlands',
+      'VRA Cricket Ground',
+      'Netherlands',
+      '1996',
+      'Scott Edwards'
+    ],
+    [14, 'Scotland', 'The Grange', 'Scotland', '1999', 'Richie Berrington'],
+    [
+      15,
+      'Nepal',
+      'Tribhuvan University International Cricket Ground',
+      'Nepal',
+      '2018',
+      'Rohit Paudel'
+    ]
   ];
 
-  static final List<String> carBrands = [
-    "Toyota",
-    "Ford",
-    "Chevrolet",
-    "Honda",
-    "Nissan",
-    "BMW",
-    "Mercedes",
-    "Volkswagen",
-    "Audi",
-    "Hyundai",
-    "Kia",
-    "Subaru",
-    "Mazda",
-    "Tesla",
-    "Lexus",
-    "Jaguar",
-    "Porsche",
-    "Volvo",
-    "Land Rover",
-    "Ferrari"
-  ];
-
-  static final List<String> countries = [
-    "United States",
-    "Canada",
-    "Mexico",
-    "Brazil",
-    "Argentina",
-    "United Kingdom",
-    "France",
-    "Germany",
-    "Italy",
-    "Spain",
-    "Australia",
-    "New Zealand",
-    "China",
-    "Japan",
-    "South Korea",
-    "India",
-    "Russia",
-    "South Africa",
-    "Egypt",
-    "Nigeria"
-  ];
-
-  static final List<String> countryCodes = [
-    "US", // United States
-    "CA", // Canada
-    "MX", // Mexico
-    "BR", // Brazil
-    "AR", // Argentina
-    "GB", // United Kingdom
-    "FR", // France
-    "DE", // Germany
-    "IT", // Italy
-    "ES", // Spain
-    "AU", // Australia
-    "NZ", // New Zealand
-    "CN", // China
-    "JP", // Japan
-    "KR", // South Korea
-    "IN", // India
-    "RU", // Russia
-    "ZA", // South Africa
-    "EG", // Egypt
-    "NG" // Nigeria
+  static final List<Map<String, dynamic>> jsonDataList = [
+    {
+      "Sr. No": 1,
+      "Members": "John Doe",
+      "Cities": "New York",
+      "Fruits": "Apple",
+      "Cars": "Tesla",
+      "Countries": "USA",
+      "Codes": "+1",
+      "Sports": "Basketball",
+      "Languages": "English",
+      "Occupation": "Engineer",
+    },
+    {
+      "Sr. No": 2,
+      "Members": "Jane Smith",
+      "Cities": "London",
+      "Fruits": "Banana",
+      "Cars": "BMW",
+      "Countries": "UK",
+      "Codes": "+44",
+      "Sports": "Football",
+      "Languages": "English",
+      "Occupation": "Doctor",
+    },
+    {
+      "Sr. No": 3,
+      "Members": "Alice Johnson",
+      "Cities": "Sydney",
+      "Fruits": "Orange",
+      "Cars": "Mercedes",
+      "Countries": "Australia",
+      "Codes": "+61",
+      "Sports": "Cricket",
+      "Languages": "English",
+      "Occupation": "Teacher",
+    },
+    {
+      "Sr. No": 4,
+      "Members": "Michael Brown",
+      "Cities": "Paris",
+      "Fruits": "Grapes",
+      "Cars": "Audi",
+      "Countries": "France",
+      "Codes": "+33",
+      "Sports": "Tennis",
+      "Languages": "French",
+      "Occupation": "Chef",
+    },
+    {
+      "Sr. No": 5,
+      "Members": "Emily Davis",
+      "Cities": "Berlin",
+      "Fruits": "Strawberry",
+      "Cars": "Porsche",
+      "Countries": "Germany",
+      "Codes": "+49",
+      "Sports": "Soccer",
+      "Languages": "German",
+      "Occupation": "Artist",
+    },
+    {
+      "Sr. No": 6,
+      "Members": "Chris Wilson",
+      "Cities": "Rome",
+      "Fruits": "Peach",
+      "Cars": "Ferrari",
+      "Countries": "Italy",
+      "Codes": "+39",
+      "Sports": "Rugby",
+      "Languages": "Italian",
+      "Occupation": "Architect",
+    },
+    {
+      "Sr. No": 7,
+      "Members": "Jessica Lee",
+      "Cities": "Madrid",
+      "Fruits": "Blueberry",
+      "Cars": "Seat",
+      "Countries": "Spain",
+      "Codes": "+34",
+      "Sports": "Basketball",
+      "Languages": "Spanish",
+      "Occupation": "Designer",
+    },
+    {
+      "Sr. No": 8,
+      "Members": "David Martinez",
+      "Cities": "Amsterdam",
+      "Fruits": "Pineapple",
+      "Cars": "Volvo",
+      "Countries": "Netherlands",
+      "Codes": "+31",
+      "Sports": "Cycling",
+      "Languages": "Dutch",
+      "Occupation": "Photographer",
+    },
+    {
+      "Sr. No": 9,
+      "Members": "Sophia Clark",
+      "Cities": "Vienna",
+      "Fruits": "Cherry",
+      "Cars": "Skoda",
+      "Countries": "Austria",
+      "Codes": "+43",
+      "Sports": "Skiing",
+      "Languages": "German",
+      "Occupation": "Scientist",
+    },
+    {
+      "Sr. No": 10,
+      "Members": "Daniel Lewis",
+      "Cities": "Zurich",
+      "Fruits": "Mango",
+      "Cars": "BMW",
+      "Countries": "Switzerland",
+      "Codes": "+41",
+      "Sports": "Ice Hockey",
+      "Languages": "German",
+      "Occupation": "Banker",
+    },
+    {
+      "Sr. No": 11,
+      "Members": "Olivia Walker",
+      "Cities": "Brussels",
+      "Fruits": "Melon",
+      "Cars": "Audi",
+      "Countries": "Belgium",
+      "Codes": "+32",
+      "Sports": "Cycling",
+      "Languages": "French",
+      "Occupation": "Journalist",
+    },
+    {
+      "Sr. No": 12,
+      "Members": "James Allen",
+      "Cities": "Prague",
+      "Fruits": "Kiwi",
+      "Cars": "Tesla",
+      "Countries": "Czech Republic",
+      "Codes": "+420",
+      "Sports": "Football",
+      "Languages": "Czech",
+      "Occupation": "Software Engineer",
+    },
+    {
+      "Sr. No": 13,
+      "Members": "Laura Robinson",
+      "Cities": "Tokyo",
+      "Fruits": "Lychee",
+      "Cars": "Toyota",
+      "Countries": "Japan",
+      "Codes": "+81",
+      "Sports": "Sumo",
+      "Languages": "Japanese",
+      "Occupation": "Animator",
+    },
+    {
+      "Sr. No": 14,
+      "Members": "Kevin Harris",
+      "Cities": "Beijing",
+      "Fruits": "Dragonfruit",
+      "Cars": "BYD",
+      "Countries": "China",
+      "Codes": "+86",
+      "Sports": "Table Tennis",
+      "Languages": "Mandarin",
+      "Occupation": "Entrepreneur",
+    },
   ];
 }
