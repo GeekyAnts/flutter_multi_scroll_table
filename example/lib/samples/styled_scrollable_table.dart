@@ -71,7 +71,6 @@ class _StyledScrollableTableExampleState
             tableDividerColor: Colors.deepPurpleAccent,
             tableBorder: Border.all(color: Colors.deepPurpleAccent),
             dataList: CommonUtils.footballTableData,
-            fixedCount: 0,
           ),
         ],
       ),

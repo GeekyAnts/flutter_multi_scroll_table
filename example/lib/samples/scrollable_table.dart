@@ -66,7 +66,6 @@ class _ScrollableTableExampleState extends State<ScrollableTableExample> {
             headers: headers,
             headerTextStyle: headerTextStyle,
             dataList: CommonUtils.footballTableData,
-            fixedCount: 0,
           ),
         ],
       ),

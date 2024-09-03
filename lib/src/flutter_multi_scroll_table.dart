@@ -19,7 +19,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
   final List<List<dynamic>>? dataList;
 
   /// The number of columns that should remain fixed when horizontally scrolling.
-  final int fixedCount;
+  final int? fixedCount;
 
   /// The total width of the table, including all columns.
   final double totalWidth;
@@ -69,7 +69,7 @@ class FlutterMultiScrollTable extends StatefulWidget {
     super.key,
     this.headers,
     this.dataList,
-    required this.fixedCount,
+    this.fixedCount = 0,
     required this.totalWidth,
     this.height = 500,
     this.isAscending = true,
@@ -212,7 +212,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
     final effectiveHeaders = widget.headers ?? jsonHeaders;
 
     if (effectiveHeaders != null) {
-      for (var header in effectiveHeaders.take(widget.fixedCount)) {
+      for (var header in effectiveHeaders.take(widget.fixedCount ?? 0)) {
         totalWidth += header.width ?? 100;
       }
     }
@@ -430,7 +430,8 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
 
   void _sortColumn() {
     setState(() {
-      for (int i = 0; i < widget.fixedCount; i++) {
+      final fixedCount = widget.fixedCount ?? 0;
+      for (int i = 0; i < fixedCount; i++) {
         columnChildren[i].sort((a, b) {
           final textA = Utils.getTextFromWidget(
               a is EachCell ? a : EachCell(text: a.toString()));
@@ -441,7 +442,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
         });
       }
 
-      for (int i = widget.fixedCount; i < columnChildren.length; i++) {
+      for (int i = fixedCount; i < columnChildren.length; i++) {
         columnChildren[i].sort((a, b) {
           final textA = Utils.getTextFromWidget(
               a is EachCell ? a : EachCell(text: a.toString()));
@@ -520,7 +521,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                       children: [
                         Row(
                           children: (widget.headers ?? jsonHeaders)!
-                              .take(widget.fixedCount)
+                              .take(widget.fixedCount ?? 0)
                               .map((header) {
                             final eachCell = header;
 
@@ -623,7 +624,7 @@ class _FlutterMultiScrollTableState extends State<FlutterMultiScrollTable> {
                                 controller: _horizontalScrollController,
                                 child: Row(
                                   children: (widget.headers ?? jsonHeaders)!
-                                      .skip(widget.fixedCount)
+                                      .skip(widget.fixedCount ?? 0)
                                       .map((header) {
                                     final eachCell = header;
 

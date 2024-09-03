@@ -91,7 +91,6 @@ class _SpecificRowStylingTableExampleState
               }
             },
             dataList: CommonUtils.footballTableData,
-            fixedCount: 0,
           ),
         ],
       ),
